@@ -21,19 +21,19 @@ ALPHA [a-zA-Z]
 "("      {parenAmnt++;printf("L_PAREN\n");}
 ")"      {parenAmnt++;printf("R_PAREN\n");}
 "="      {equalAmnt++;printf("EQUAL\n");}
+" "	     {}
 .  		 {printf("Invalid input: %s\n",yytext); return;}
 
 
 
 %%
 
-main(void) {
-	printf("INTEGER: %d\n", 12345);
-	printf("STRING : %s\n", "[A String]");
-	printf("Ctrl+D to quit\n");
+main(int argc, char* argv[]) {
+	yyin = fopen(argv[1], "r");
 	yylex();
 	printf("Number of total integers: %d\n", intAmnt);
 	printf("Number of total operators: %d\n", opsAmnt);
 	printf("Number of total parentheses: %d\n", parenAmnt);
 	printf("Number of total equal signs: %d\n", equalAmnt);
+	fclose(yyin);
 }
