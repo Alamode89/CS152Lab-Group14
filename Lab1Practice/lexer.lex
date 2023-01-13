@@ -1,5 +1,10 @@
 %{
 #include <stdio.h>
+
+int intAmnt = 0;
+int opsAmnt = 0;
+int parenAmnt = 0;
+int equalAmnt = 0;
 %}
 
 DIGIT [0-9]
@@ -7,15 +12,15 @@ ALPHA [a-zA-Z]
 
 %%
 
-{DIGIT}+ {printf("DIGIT %s\n", yytext);}
+{DIGIT}+ {intAmnt++;printf("DIGIT %s\n", yytext);}
 {ALPHA}+ {printf("STRING %s\n", yytext);}
-"+"      {printf("PLUS\n");}
-"-"      {printf("MINUS\n");}
-"*"      {printf("MULT\n");}
-"/"      {printf("DIV\n");}
-"("      {printf("L_PAREN\n");}
-")"      {printf("R_PAREN\n");}
-"="      {printf("EQUAL\n");}
+"+"      {opsAmnt++;printf("PLUS\n");}
+"-"      {opsAmnt++;printf("MINUS\n");}
+"*"      {opsAmnt++;printf("MULT\n");}
+"/"      {opsAmnt++;printf("DIV\n");}
+"("      {parenAmnt++;printf("L_PAREN\n");}
+")"      {parenAmnt++;printf("R_PAREN\n");}
+"="      {equalAmnt++;printf("EQUAL\n");}
 .  		 {printf("Invalid input: %s\n",yytext); return;}
 
 
@@ -27,4 +32,8 @@ main(void) {
 	printf("STRING : %s\n", "[A String]");
 	printf("Ctrl+D to quit\n");
 	yylex();
+	printf("Number of total integers: %d\n", intAmnt);
+	printf("Number of total operators: %d\n", opsAmnt);
+	printf("Number of total parentheses: %d\n", parenAmnt);
+	printf("Number of total equal signs: %d\n", equalAmnt);
 }
