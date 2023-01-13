@@ -16,7 +16,9 @@ ALPHA [a-zA-Z]
 "("      {printf("L_PAREN\n");}
 ")"      {printf("R_PAREN\n");}
 "="      {printf("EQUAL\n");}
-.        {}
+.  		 {printf("Invalid input: %s\n",yytext); return;}
+
+
 
 %%
 
