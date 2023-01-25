@@ -47,8 +47,8 @@ Table for the symbols in our language and their token name:
 | (  	| L_PAREN  	|
 | )  	| R_PAREN  	|
 | =  	| EQUAL  	|
-| <  	| LESS  	|
-| >  	| GREATER  	|
+| <  	| LESS_THAN  	|
+| >  	| GREATER_THAN  	|
 | !  	| NOT  	|
 | !=  	| NOT_EQUAL  	|
 | >=  	| GTE  	|
