@@ -55,7 +55,7 @@ Table for the symbols in our language and their token name:
 | <=  	| LTE  	|
 | ==  	| EQUAL_TO |
 | &&  	| AND |
-| ||  	| OR |
+| \|\|  	| OR |
 | {  	| L_BRACE  	|
 | }  	| R_BRACE  	|
 | ;  	| SEMICOLON  	|
