@@ -39,6 +39,7 @@ Table for the symbols in our language and their token name:
 |  Symbol in Language 	|  Token Name 	|
 |---	|---	|
 | integer number (e.g., "0", "12", "1719")  	| NUMBER XXXX [where XXXX is the number itself]  	|
+| identifiers (e.g, "a", "val", "NUM_1")  	| IDENTIFIER XYZ [where XYZ is the name of an identifier]  	|
 | +  	| PLUS  	|
 | -  	| MINUS  	|
 | * 	| MULT  	|
@@ -49,17 +50,26 @@ Table for the symbols in our language and their token name:
 | <  	| LESS  	|
 | >  	| GREATER  	|
 | !  	| NOT  	|
+| !=  	| NOT_EQUAL  	|
+| >=  	| GTE  	|
+| <=  	| LTE  	|
+| ==  	| EQUAL_TO |
+| &&  	| AND |
+| ||  	| OR |
 | {  	| L_BRACE  	|
 | }  	| R_BRACE  	|
 | ;  	| SEMICOLON  	|
+| ,  	| COMMA  	|
 | [  	| L_BRACK  	|
 | ]  	| R_BRACK  	|
 | if  	| IF  	|
+| else  	| ELSE  	|
+| elif  	| ELIF  	|
 | int  	| INTEGER  	|
-| ,  	| COMMA  	|
 | while  	| WHILE  	|
 | whileo  	| WHILEO  	|
 | break  	| BREAK  	|
 | read  	| READ  	|
 | write  	| WRITE  	|
-| /  	| FORWARD_SLASH  	|
+| func  	| FUNCTION  |
+| return  	| RETURN  	|
