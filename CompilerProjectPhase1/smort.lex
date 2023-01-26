@@ -5,7 +5,7 @@
 NUMBER [0-9]
 IDENTIFIER [a-z][a-z0-9]*
 LINE_COMMENT "\/\/".*"\n"
-BLOCK_COMMENT "\/\*".*"\/\*"
+BLOCK_COMMENT "\/\*".*?"\*\/"
 
 %%
 

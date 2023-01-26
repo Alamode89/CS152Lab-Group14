@@ -5,4 +5,3 @@ while (val < 20) {
   a[i] = 24;
   val = val + 1;
 }
-return 0;
