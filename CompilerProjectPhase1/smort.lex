@@ -44,6 +44,7 @@ read                {printf("READ\n");}
 write               {printf("WRITE\n");}
 func                {printf("FUNCTION\n");}
 return              {printf("RETURN\n");}
+arr                 {printf("ARRAY\n");}
 {IDENTIFIER}        {printf("IDENTIFIER %s\n", yytext);}
 " "|"\n"            {}
 .                   {printf("Invalid input: %s\n", yytext);return;}
