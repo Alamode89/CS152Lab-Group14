@@ -24,6 +24,9 @@ IDENTIFIER [a-z][a-z0-9]*
 "=="     {printf("EQUAL_TO\n");}
 "&&"     {printf("AND\n");}
 "||"     {printf("OR\n");}
+"//"     {printf("LINE_COMMENT\n");}
+"/*"     {printf("CBLOCK_OPEN\n");}
+"*/"     {printf("CBLOCK_CLOSE\n");}
 "{"      {printf("L_BRACE\n");}
 "}"      {printf("R_BRACE\n");}
 ";"      {printf("SEMICOLON\n");}
