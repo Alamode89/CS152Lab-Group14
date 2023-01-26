@@ -8,5 +8,3 @@ x = x / y
 write(x); //should print out 14
 y = 5 * 5
 write(y) //should print out 25
-
-
