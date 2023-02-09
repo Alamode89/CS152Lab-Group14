@@ -5,10 +5,8 @@ int col = 1;
 %}
 
 NUMBER [0-9]
-IDENTIFIER [a-z][a-zA-Z0-9"_"]*
-LINE_COMMENT "\/\/".*
-
-%x BLOCK_COMMENT
+IDENTIFIER [a-z][a-zA-Z0-9_]
+LINE_COMMENT "\/\/".*"\n"
 
 %%
 
@@ -53,9 +51,7 @@ arr                 {printf("ARRAY\n");col+=3;}
 "\n"                {row++;col = 1;}
 .                   {printf("Invalid input: %s  at row %d col %d\n", yytext, row, col);return;}
 {LINE_COMMENT}      {}
-"/*"                {BEGIN(BLOCK_COMMENT);}
-<BLOCK_COMMENT>"*/" {BEGIN(INITIAL);}
-<BLOCK_COMMENT>.    {}
+"/*"(.|\n)*"*/"     {}
 
 %%
 
