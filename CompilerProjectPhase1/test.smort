@@ -1,6 +1,6 @@
 int x = 525;
 x = x + 43;
-int val = 0;
+int val4 = 0;
 while (val < 20) {
   a[i] = 24;
   val = val + 1;
