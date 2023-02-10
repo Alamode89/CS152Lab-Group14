@@ -5,7 +5,7 @@ int col = 1;
 %}
 
 NUMBER [0-9]
-IDENTIFIER [a-z][a-zA-Z0-9_]
+IDENTIFIER [a-z]("_"*?[a-zA-Z0-9])*
 LINE_COMMENT "\/\/".*"\n"
 
 %%
@@ -49,9 +49,13 @@ arr                 {printf("ARRAY\n");col+=3;}
 " "                 {col++;}
 "\t"                {col+=2;}
 "\n"                {row++;col = 1;}
-.                   {printf("Invalid input: %s  at row %d col %d\n", yytext, row, col);return;}
 {LINE_COMMENT}      {}
 "/*"(.|\n)*"*/"     {}
+[0-9]{IDENTIFIER}   {printf("Invalid Identifier: cannot start with a number\n");col+=yyleng+1;}
+"_"{IDENTIFIER}     {printf("Invalid Identifier: cannot start with an underscore\n");col+=yyleng+1;}
+[A-Z]{IDENTIFIER}   {printf("Invalid Identifier: cannot start with a captital letter\n");col+=yyleng+1;}
+{IDENTIFIER}"_"     {printf("Invalid Identifier: cannot end in an underscore\n");col+=yyleng+1;}
+.                   {printf("Invalid input: %s at row %d col %d\n", yytext, row, col);return;}
 
 %%
 
