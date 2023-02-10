@@ -31,7 +31,7 @@ Examples of the above listed features are in the table below:
 
 Here are some additional details about this language:
   - A comment is initiated by "//" and extends to the end of the current line. A comment can also be a block and is created by initiating it with " /* " and ends until " */ " is encountered.
-  - A vaild identifier in SmortLanguage-S must begin with a letter, followed by any number of letters, numbers, or underscores. The identifies must contains no whitespaces and must end in either a letter or a number.
+  - A vaild identifier in SmortLanguage-S must begin with a lowercase letter, followed by any number of upper or lowercase letters, numbers, or underscores. The identifier must contains no whitespaces and must end in either a lower or uppercase letter or a number.
   - SmortLanguage-S is case sensitive. 
   - A whitespace in SmortLanguage-S occurs when a blank space, tab, or newline is encountered. 
 
