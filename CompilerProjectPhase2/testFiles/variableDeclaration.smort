@@ -1,3 +1,10 @@
-int x = b+x;
-int b = x;
+func int z(int x, int y)
+{
+  int x = y + 7;
+  return x;
+}
+int b = 5;
+int x = 3;
+int w = b+x;
 read(b);
+x = z(b, x);

@@ -10,8 +10,23 @@
 
 %%
 
-prog_start:main {printf("prog_start -> main\n");}
+prog_start:functions main {printf("prog_start -> functions main\n");}
           ;
+
+functions:%empty {printf("functions -> empty\n");}
+         |function functions {printf("functions -> function functions\n");}
+
+function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE
+          {printf("FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE\n");}
+        ;
+
+arguments:argument {printf("arguments -> argument\n");}
+         |argument COMMA arguments {printf("arguments -> argument COMMA arguments\n");}
+         ;
+
+argument: %empty {printf("argument -> empty\n");}
+        |INTEGER IDENTIFIER {printf("argument -> INTEGER IDENTIFIER\n");}
+        ;
 
 main:statements {printf("main -> statements\n");}
     ;
@@ -34,8 +49,23 @@ prefix: %empty {printf("prefix -> empty\n");}
       ;
 
 initialization:%empty {printf("initialization -> empty\n");}
-              |EQUAL expression {printf("initialization -> EQUAL expression\n");}
+              |EQUAL r_of_equals {printf("initialization -> EQUAL r_of_equals\n");}
               ;
+
+r_of_equals: expression {printf("r_of_equals -> expression\n");}
+           |function_call {printf("r_of_equals -> function_call\n");}
+           ;
+
+function_call:IDENTIFIER L_PAREN args R_PAREN {printf("function_call -> IDENTIFIER L_PAREN args R_PAREN\n");}
+             ;
+
+args: %empty {printf("args -> empty\n");}
+    |IDENTIFIER mlt_args {printf("args -> IDENTIFIER mlt_args\n");}
+    ;
+
+mlt_args:%empty {printf("mlt_args -> empty\n");}
+        |COMMA IDENTIFIER mlt_args {printf("mlt_args -> COMMA IDENTIFIER mlt_args\n");}
+        ;
 
 read:READ L_PAREN IDENTIFIER R_PAREN {printf("read -> READ L_PAREN IDENTIFIER R_PAREN\n");}
     ;
