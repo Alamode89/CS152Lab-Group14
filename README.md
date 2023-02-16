@@ -24,7 +24,7 @@ Examples of the above listed features are in the table below:
 | Arithmetic Operators (e.g., "+", "-", "*", "/") | a = x + y;<br>b = x - y;<br>c = x * y;<br>d = x/y; |
 | Comparison Operators (e.g., “<”, “==”, “>”, “!=”) | a == y;<br>a < y;<br>a > y;<br>a != y; |
 | While Loops | while (x < 100 &&) {<br>//code<br>} |
-| If-then-else statements | if x < 4 {<br> //statement<br>}<br><br>elif {<br>  //statement<br>}<br><br>else {<br> //statement<br>} |
+| If-then-else statements | if (x < 4) {<br> //statement<br>}<br><br>elif (y > 2){<br>  //statement<br>}<br><br>else {<br> //statement<br>} |
 | Read and Write Statements | read(x)<br>write(y)<br> |
 | Comments | // this is a comment<br><br>/* <br>and this is a comment block<br> */ |
 | Functions (that can take multiple scalar arguments and return a single scalar result) | func int sqrt(int x) {<br> return x;<br>} |
