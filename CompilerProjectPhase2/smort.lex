@@ -47,6 +47,8 @@ func                {col+=4;return FUNCTION;}
 return              {col+= 6;return RETURN;}
 arr                 {col+=3;return ARRAY;}
 {IDENTIFIER}        {col += yyleng;return IDENTIFIER;}
+TRUE                {col+=4;return TRUE;}
+FALSE               {col+=5;return FALSE;}
 " "                 {col++;}
 "\t"                {col+=2;}
 "\n"                {row++;col = 1;}
