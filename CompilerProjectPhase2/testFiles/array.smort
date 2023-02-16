@@ -9,13 +9,13 @@ int y;
 x = 8;
 y = 2;
 arr[0] = x + y;
-write arr[0]; //should print out 10
+write(arr[0]); //should print out 10
 
 arr[1] = 20;
-write arr[1]; //should print out 20
+write(arr[1]); //should print out 20
 
 arr[2] = 50;
-write arr[2]; //should print out 50
+write(arr[2]); //should print out 50
 
 arr[3] = arr[0] + (arr[1] - y);
-write arr[3]; //should print 28
+write(arr[3]); //should print 28

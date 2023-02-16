@@ -62,6 +62,7 @@ term: NUMBER {printf("term -> NUMBER\n");}
     |IDENTIFIER {printf("term -> IDENTIFIER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
     ;
+
 %%
 
 void main (int argc, char** argv)
