@@ -1,3 +1,0 @@
-int x = b+x;
-int b = x;
-read(b);
