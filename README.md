@@ -27,7 +27,7 @@ Examples of the above listed features are in the table below:
 | If-then-else statements | if x < 4 {<br> //statement<br>}<br><br>elif {<br>  //statement<br>}<br><br>else {<br> //statement<br>} |
 | Read and Write Statements | read(x)<br>write(y)<br> |
 | Comments | // this is a comment<br><br>/* <br>and this is a comment block<br> */ |
-| Functions (that can take multiple scalar arguments and return a single scalar result) | func int sqrt(int x) {<br><br>} |
+| Functions (that can take multiple scalar arguments and return a single scalar result) | func int sqrt(int x) {<br> return x;<br>} |
 
 Here are some additional details about this language:
   - A comment is initiated by "//" and extends to the end of the current line. A comment can also be a block and is created by initiating it with " /* " and ends until " */ " is encountered.
