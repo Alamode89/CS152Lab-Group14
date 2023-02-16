@@ -18,6 +18,7 @@ main:statements {printf("main -> statements\n");}
 
 statements:%empty {printf("statements -> empty\n");}
           |statement SEMICOLON statements {printf("statements -> statement SEMICOLON statements\n");}
+          |WHILE condition L_BRACE statements R_BRACE {printf("statements -> while conditions L_BRACE statements R_BRACE");}
           ;
 
 statement:variable_declaration {printf("statement -> variable_declaration\n");}
@@ -63,6 +64,18 @@ term: NUMBER {printf("term -> NUMBER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
     ;
 
+conditions: condition conditions {printf("conditions -> condition conditions");};
+
+condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN");}
+
+bool_statement: term GREATER_THAN term {printf("bool_statement -> term GREATER_THAN term");}
+              | term LESS_THAN term {printf("bool_statement -> term LESS_THAN term");}
+              | term GTE term {printf("bool_statement -> term GTE term");}
+              | term LTE term {printf("bool_statement -> term LTE term");}
+              | term EQUAL_TO term {printf("bool_statement -> term EQUAL_TO term");}
+              | TRUE {printf("bool_statement -> TRUE");}
+              | FALSE {printf("bool_statement -> FALSE");}
+            ;
 %%
 
 void main (int argc, char** argv)
