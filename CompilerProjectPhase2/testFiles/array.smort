@@ -17,5 +17,5 @@ write(arr[1]); //should print out 20
 arr[2] = 50;
 write(arr[2]); //should print out 50
 
-arr[3] = arr[0] + (arr[1] - y);
+arr[3] = arr[0];
 write(arr[3]); //should print 28
