@@ -43,6 +43,7 @@ statement:variable_declaration {printf("statement -> variable_declaration\n");}
          |IF condition L_BRACE statements R_BRACE branch {printf("statement -> IF condition L_BRACE statements R_BRACE branch\n");}
          |WHILEO L_BRACE statements R_BRACE WHILE condition {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
          |RETURN term {printf("statement -> RETURN term\n");}
+         |ARRAY L_BRACK terms R_BRACK initialization {printf("statement -> ARRAY expression\n");}
          ;
 
 branch: %empty {printf("branch -> empty\n");}
@@ -63,6 +64,7 @@ initialization:%empty {printf("initialization -> empty\n");}
 
 r_of_equals: expression {printf("r_of_equals -> expression\n");}
            |function_call {printf("r_of_equals -> function_call\n");}
+           |ARRAY L_BRACK terms R_BRACK {printf("r_of_equals -> ARRAY expression\n");}
            ;
 
 function_call:IDENTIFIER L_PAREN args R_PAREN {printf("function_call -> IDENTIFIER L_PAREN args R_PAREN\n");}
@@ -80,6 +82,7 @@ read:READ L_PAREN IDENTIFIER R_PAREN {printf("read -> READ L_PAREN IDENTIFIER R_
     ;
 
 write:WRITE L_PAREN IDENTIFIER R_PAREN {printf("write -> WRITE L_PAREN IDENTIFIER R_PAREN\n");}
+     |WRITE L_PAREN ARRAY L_BRACK terms R_BRACK R_PAREN {printf("write -> WRITE ARRAY expression\n");}
      ;
 
 expression: expression addop multerm {printf("expression -> expression addop multerm\n");}
@@ -96,6 +99,11 @@ multerm: multerm mulop term {printf("multerm -> multerm mulop term\n");}
 
 mulop: MULT {printf("mulop -> MULT\n");} 
      |DIV {printf("mulop -> DIV\n");}
+     ;
+
+terms: %empty {printf("terms -> empty\n");}
+     |term {printf("terms -> term\n");}
+     |term COMMA {printf("terms -> term\n");}
      ;
 
 term: NUMBER {printf("term -> NUMBER\n");}
