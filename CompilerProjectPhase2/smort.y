@@ -10,7 +10,7 @@
 
 %%
 
-prog_start:main {printf("prog_start -> statements\n");}
+prog_start:main {printf("prog_start -> main\n");}
           ;
 
 main:statements {printf("main -> statements\n");}
