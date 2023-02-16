@@ -10,24 +10,38 @@
 
 %%
 
-prog_start: %empty  {printf("prog_start -> epsilon\n");}
-          |variable_declaration  {printf("prog_start -> variable_declaration\n");}
+prog_start:main {printf("prog_start -> statements\n");}
           ;
 
-variable_declaration: INTEGER IDENTIFIER initialization SEMICOLON {printf("variable_declaration -> INTEGER IDENTIFIER initialization SEMICOLON\n");}
+main:statements {printf("main -> statements\n");}
+    ;
+
+statements:%empty {printf("statements -> empty\n");}
+          |statement SEMICOLON statements {printf("statements -> statement SEMICOLON statements\n");}
+          ;
+
+statement:variable_declaration {printf("statement -> variable_declaration\n");}
+         |read {printf("statement -> read\n");}
+         |write {printf("statement -> write\n");}
+         ;
+
+variable_declaration: prefix IDENTIFIER initialization {printf("variable_declaration -> prefix IDENTIFIER initialization\n");}
                     ;
 
+prefix: %empty {printf("prefix -> empty\n");}
+      |INTEGER {printf("prefix -> INTEGER\n");}
+      ;
+
 initialization:%empty {printf("initialization -> empty\n");}
-              |EQUAL r_of_equals {printf("initialization -> EQUAL r_of_equals\n");}
+              |EQUAL expression {printf("initialization -> EQUAL expression\n");}
               ;
 
-r_of_equals: expression {printf("r_of_equals -> expression\n");}
-           |IDENTIFIER r_of_identifier {printf("r_of_equals -> IDENTIFIER r_of_identifier\n");}
-           ;
+read:READ L_PAREN IDENTIFIER R_PAREN {printf("read -> READ L_PAREN IDENTIFIER R_PAREN\n");}
+    ;
 
-r_of_identifier: %empty {printf("r_of_identifier -> empty\n");}
-               |EQUAL r_of_equals {printf("r_of_identifier -> EQUAL r_of_equals\n");}
-               ;
+write:WRITE L_PAREN IDENTIFIER R_PAREN {printf("write -> WRITE L_PAREN IDENTIFIER R_PAREN\n");}
+     ;
+
 expression: expression addop multerm {printf("expression -> expression addop multerm\n");}
           |multerm {printf("expression -> multerm\n");}
           ;
@@ -45,7 +59,8 @@ mulop: MULT {printf("mulop -> MULT\n");}
      ;
 
 term: NUMBER {printf("term -> NUMBER\n");}
-    |L_PAREN expression R_PAREN {printf("term -> R_PAREN expression L_PAREN\n");}
+    |IDENTIFIER {printf("term -> IDENTIFIER\n");}
+    |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
     ;
 %%
 

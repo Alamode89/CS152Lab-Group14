@@ -1,1 +1,3 @@
-int x = y = r = 3+(5/7);
+int x = b+x;
+int b = x;
+read(b);
