@@ -4,3 +4,4 @@ parser
 y.tab.c
 y.tab.h
 y.output
+Makefile
