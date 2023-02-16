@@ -33,13 +33,22 @@ main:statements {printf("main -> statements\n");}
 
 statements:%empty {printf("statements -> empty\n");}
           |statement SEMICOLON statements {printf("statements -> statement SEMICOLON statements\n");}
-          |WHILE condition L_BRACE statements R_BRACE {printf("statements -> while conditions L_BRACE statements R_BRACE");}
+          |statement statements {printf("statements -> statement statements\n");}
           ;
 
 statement:variable_declaration {printf("statement -> variable_declaration\n");}
          |read {printf("statement -> read\n");}
          |write {printf("statement -> write\n");}
+         |WHILE condition L_BRACE statements R_BRACE {printf("statement -> WHILE conditions L_BRACE statements R_BRACE\n");}
+         |IF condition L_BRACE statements R_BRACE branch {printf("statement -> IF condition L_BRACE statements R_BRACE branch\n");}
+         |WHILEO L_BRACE statements R_BRACE WHILE condition {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
+         |RETURN term {printf("statement -> RETURN term\n");}
          ;
+
+branch: %empty {printf("branch -> empty\n");}
+        |ELIF condition L_BRACE statements R_BRACE branch {printf("branch -> ELIF condition L_BRACE statements R_BRACE\n");}
+        |ELSE L_BRACE statements R_BRACE {printf("branch -> ELSE L_BRACE statements R_BRACE\n");}
+        ;
 
 variable_declaration: prefix IDENTIFIER initialization {printf("variable_declaration -> prefix IDENTIFIER initialization\n");}
                     ;
@@ -94,17 +103,18 @@ term: NUMBER {printf("term -> NUMBER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
     ;
 
-conditions: condition conditions {printf("conditions -> condition conditions");};
+conditions: condition conditions {printf("conditions -> condition conditions\n");};
 
-condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN");}
+condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN\n");}
 
-bool_statement: term GREATER_THAN term {printf("bool_statement -> term GREATER_THAN term");}
-              | term LESS_THAN term {printf("bool_statement -> term LESS_THAN term");}
-              | term GTE term {printf("bool_statement -> term GTE term");}
-              | term LTE term {printf("bool_statement -> term LTE term");}
-              | term EQUAL_TO term {printf("bool_statement -> term EQUAL_TO term");}
-              | TRUE {printf("bool_statement -> TRUE");}
-              | FALSE {printf("bool_statement -> FALSE");}
+bool_statement: term GREATER_THAN term {printf("bool_statement -> term GREATER_THAN term\n");}
+              | term LESS_THAN term {printf("bool_statement -> term LESS_THAN term\n");}
+              | term GTE term {printf("bool_statement -> term GTE term\n");}
+              | term LTE term {printf("bool_statement -> term LTE term\n");}
+              | term EQUAL_TO term {printf("bool_statement -> term EQUAL_TO term\n");}
+              | term NOT_EQUAL term {printf("bool_statement -> term NOT_EQUAL term\n");}
+              | TRUE {printf("bool_statement -> TRUE\n");}
+              | FALSE {printf("bool_statement -> FALSE\n");}
             ;
 %%
 

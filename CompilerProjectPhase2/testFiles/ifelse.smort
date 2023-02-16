@@ -5,10 +5,15 @@ that spans across multiple lines
 
 int x = 9;
 int y = 25;
-if x > y {
+
+if(x > y) {
   write(x);
-} elif y > x {
+} 
+
+elif(y > x) {
     write(y);
-} else {
+} 
+
+else {
     write(x);
 }
