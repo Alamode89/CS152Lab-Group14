@@ -47,6 +47,7 @@ mulop: MULT {printf("mulop -> MULT\n");}
 term: NUMBER {printf("term -> NUMBER\n");}
     |L_PAREN expression R_PAREN {printf("term -> R_PAREN expression L_PAREN\n");}
     ;
+
 %%
 
 void main (int argc, char** argv)
