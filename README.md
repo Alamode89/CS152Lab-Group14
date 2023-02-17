@@ -20,7 +20,7 @@ Examples of the above listed features are in the table below:
 | --- | --- |
 | Integer Scalar Variables | int a;<br>int b;|
 | One-Dimensional Arrays of Integers | arr[1,2,3,4,5,6,7,8,9];<br> arr[8] |
-| Assignment Statements | int a = 5;<br>int b = 3;<br>int c = [4,5,6,4];|
+| Assignment Statements | int a = 5;<br>int b = 3;<br>int c = b;|
 | Arithmetic Operators (e.g., "+", "-", "*", "/") | a = x + y;<br>b = x - y;<br>c = x * y;<br>d = x/y; |
 | Comparison Operators (e.g., “<”, “==”, “>”, “!=”) | a == y;<br>a < y;<br>a > y;<br>a != y; |
 | While Loops | while (x < 100 &&) {<br>//code<br>} |
