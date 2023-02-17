@@ -25,25 +25,24 @@ arguments:argument {printf("arguments -> argument\n");}
          ;
 
 argument: %empty {printf("argument -> empty\n");}
-        |INTEGER IDENTIFIER {printf("argument -> INTEGER IDENTIFIER\n");}
+        |INTEGER IDENTIFIER arguments {printf("argument -> INTEGER IDENTIFIER arguments\n");}
         ;
 
 main:statements {printf("main -> statements\n");}
     ;
 
 statements:%empty {printf("statements -> empty\n");}
-          |statement SEMICOLON statements {printf("statements -> statement SEMICOLON statements\n");}
           |statement statements {printf("statements -> statement statements\n");}
           ;
 
-statement:variable_declaration {printf("statement -> variable_declaration\n");}
-         |read {printf("statement -> read\n");}
-         |write {printf("statement -> write\n");}
-         |WHILE condition L_BRACE statements R_BRACE {printf("statement -> WHILE conditions L_BRACE statements R_BRACE\n");}
+statement:variable_declaration SEMICOLON {printf("statement -> variable_declaration SEMICOLON\n");}
+         |read SEMICOLON{printf("statement -> read SEMICOLON\n");}
+         |write SEMICOLON {printf("statement -> write SEMICOLON\n");}
+         |WHILE condition L_BRACE statements R_BRACE {printf("statement -> WHILE condition L_BRACE statements R_BRACE\n");}
          |IF condition L_BRACE statements R_BRACE branch {printf("statement -> IF condition L_BRACE statements R_BRACE branch\n");}
          |WHILEO L_BRACE statements R_BRACE WHILE condition {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
-         |RETURN term {printf("statement -> RETURN term\n");}
-         |ARRAY L_BRACK terms R_BRACK initialization {printf("statement -> ARRAY expression\n");}
+         |RETURN term SEMICOLON {printf("statement -> RETURN term SEMICOLON\n");}
+         |ARRAY L_BRACK terms R_BRACK initialization SEMICOLON{printf("statement -> ARRAY expression SEMICOLON\n");}
          ;
 
 branch: %empty {printf("branch -> empty\n");}
@@ -81,9 +80,12 @@ mlt_args:%empty {printf("mlt_args -> empty\n");}
 read:READ L_PAREN IDENTIFIER R_PAREN {printf("read -> READ L_PAREN IDENTIFIER R_PAREN\n");}
     ;
 
-write:WRITE L_PAREN IDENTIFIER R_PAREN {printf("write -> WRITE L_PAREN IDENTIFIER R_PAREN\n");}
-     |WRITE L_PAREN ARRAY L_BRACK terms R_BRACK R_PAREN {printf("write -> WRITE ARRAY expression\n");}
+write:WRITE L_PAREN identifier_or_array R_PAREN {printf("write -> WRITE L_PAREN identifier_or_array R_PAREN\n");}
      ;
+
+identifier_or_array:IDENTIFIER {printf("identifier_or_array -> IDENTIFIER\n");}
+                   |ARRAY L_BRACK terms R_BRACK {printf("idenetifier_or_array -> ARRAY L_BRACK terms R_BRACK\n");}
+                   ;
 
 expression: expression addop multerm {printf("expression -> expression addop multerm\n");}
           |multerm {printf("expression -> multerm\n");}
@@ -111,19 +113,24 @@ term: NUMBER {printf("term -> NUMBER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
     ;
 
-conditions: condition conditions {printf("conditions -> condition conditions\n");};
+conditions: condition conditions {printf("conditions -> condition conditions\n");}
+          |%empty {printf("conditions -> empty\n");}
+          ;
+          
+condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN\n");};
 
-condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN\n");}
-
-bool_statement: term GREATER_THAN term {printf("bool_statement -> term GREATER_THAN term\n");}
-              | term LESS_THAN term {printf("bool_statement -> term LESS_THAN term\n");}
-              | term GTE term {printf("bool_statement -> term GTE term\n");}
-              | term LTE term {printf("bool_statement -> term LTE term\n");}
-              | term EQUAL_TO term {printf("bool_statement -> term EQUAL_TO term\n");}
-              | term NOT_EQUAL term {printf("bool_statement -> term NOT_EQUAL term\n");}
+bool_statement: term bool_operation term {printf("bool_statement -> term bool_operation term\n");}
               | TRUE {printf("bool_statement -> TRUE\n");}
               | FALSE {printf("bool_statement -> FALSE\n");}
-            ;
+              ;
+
+bool_operation: GREATER_THAN {printf("bool_operation -> GREATER_THAN\n");}
+              |LESS_THAN {printf("bool_operation -> LESS_THAN\n");}
+              |GTE {printf("bool_operation -> GTE\n");}
+              |LTE {printf("bool_operation -> LTE\n");}
+              |EQUAL_TO {printf("bool_operation -> EQUAL_TO\n");}
+              |NOT_EQUAL {printf("bool_operation -> NOT_EQUAL\n");}
+              ;
 %%
 
 void main (int argc, char** argv)
@@ -140,7 +147,7 @@ void main (int argc, char** argv)
   }
   yyparse();
 }
-int yyerror()
+int yyerror(char *s)
 {
-  fprintf(stderr, "INVALID SYNTAX\n");
+  fprintf(stderr, "INVALID SYNTAX: %s\n",s);
 }

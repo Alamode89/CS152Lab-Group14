@@ -1,4 +1,4 @@
-func int z(int x, int y)
+func int test()
 {
   int x = y + 7;
   return x;
