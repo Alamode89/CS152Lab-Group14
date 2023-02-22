@@ -15,10 +15,21 @@ prog_start:functions main {printf("prog_start -> functions main\n");}
 
 functions:%empty {printf("functions -> empty\n");}
          |function functions {printf("functions -> function functions\n");}
+         ;
 
-function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE
-          {printf("FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE\n");}
+function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN returns SEMICOLON R_BRACE
+          {printf("function -> FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN returns SEMICOLON R_BRACE\n");}
         ;
+
+returns: return returns {printf("returns -> return returns\n");}
+        |return addop returns {printf("returns -> return addop returns\n");}
+        |return mulop returns {printf("returns -> return mulop returns\n");}
+        |%empty {printf("returns -> empty\n");}
+        ;
+
+return:term {printf("return -> term\n");}
+      |function_call {printf("return -> function_call\n");}
+      ;
 
 arguments:argument {printf("arguments -> argument\n");}
          |argument COMMA arguments {printf("arguments -> argument COMMA arguments\n");}
