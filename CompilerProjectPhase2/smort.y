@@ -15,10 +15,21 @@ prog_start:functions main {printf("prog_start -> functions main\n");}
 
 functions:%empty {printf("functions -> empty\n");}
          |function functions {printf("functions -> function functions\n");}
+         ;
 
-function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE
-          {printf("FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE\n");}
+function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN returns SEMICOLON R_BRACE
+          {printf("function -> FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN returns SEMICOLON R_BRACE\n");}
         ;
+
+returns: return returns {printf("returns -> return returns\n");}
+        |return addop returns {printf("returns -> return addop returns\n");}
+        |return mulop returns {printf("returns -> return mulop returns\n");}
+        |%empty {printf("returns -> empty\n");}
+        ;
+
+return:term {printf("return -> term\n");}
+      |function_call {printf("return -> function_call\n");}
+      ;
 
 arguments:argument {printf("arguments -> argument\n");}
          |argument COMMA arguments {printf("arguments -> argument COMMA arguments\n");}
@@ -42,7 +53,6 @@ statement:variable_declaration {printf("statement -> variable_declaration\n");}
          |WHILE condition L_BRACE statements R_BRACE {printf("statement -> WHILE conditions L_BRACE statements R_BRACE\n");}
          |IF condition L_BRACE statements R_BRACE branch {printf("statement -> IF condition L_BRACE statements R_BRACE branch\n");}
          |WHILEO L_BRACE statements R_BRACE WHILE condition {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
-         |RETURN term {printf("statement -> RETURN term\n");}
          |ARRAY L_BRACK terms R_BRACK initialization {printf("statement -> ARRAY expression\n");}
          ;
 

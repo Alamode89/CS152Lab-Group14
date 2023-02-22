@@ -1,8 +1,8 @@
-func int z(int x, int y)
-{
-  int x = y + 7;
-  return x;
+func int factorial(int x) {
+  x = 5+3;
+  return x * y;
 }
+
 int b = 5;
 int x = 3;
 int w = b+x;
