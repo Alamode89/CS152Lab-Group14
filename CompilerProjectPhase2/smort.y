@@ -121,9 +121,9 @@ term: NUMBER {printf("term -> NUMBER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
     ;
 
-conditions: condition {printf("conditions -> condition conditions\n");}
-          |condition AND conditions {printf("conditions -> AND conditions\n");}
-          |condition OR conditions {printf("conditions -> OR conditions\n");}
+conditions: condition {printf("conditions -> condition\n");}
+          |condition AND conditions {printf("conditions -> condition AND conditions\n");}
+          |condition OR conditions {printf("conditions -> condition OR conditions\n");}
           ;
 
 condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN\n");};
