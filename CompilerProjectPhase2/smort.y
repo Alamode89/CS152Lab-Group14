@@ -36,13 +36,14 @@ arguments:argument {printf("arguments -> argument\n");}
          ;
 
 argument: %empty {printf("argument -> empty\n");}
-        |INTEGER IDENTIFIER arguments {printf("argument -> INTEGER IDENTIFIER arguments\n");}
+        |INTEGER IDENTIFIER {printf("argument -> INTEGER IDENTIFIER\n");}
         ;
 
 main:statements {printf("main -> statements\n");}
     ;
 
 statements:%empty {printf("statements -> empty\n");}
+          |statement SEMICOLON statements {printf("statements -> statement SEMICOLON statements\n");}
           |statement statements {printf("statements -> statement statements\n");}
           ;
 
@@ -52,15 +53,8 @@ statement:variable_declaration SEMICOLON {printf("statement -> variable_declarat
          |WHILE condition L_BRACE statements R_BRACE {printf("statement -> WHILE condition L_BRACE statements R_BRACE\n");}
          |IF condition L_BRACE statements R_BRACE branch {printf("statement -> IF condition L_BRACE statements R_BRACE branch\n");}
          |WHILEO L_BRACE statements R_BRACE WHILE condition {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
-         |make_array {printf("statement -> make_array\n");}
+         |ARRAY L_BRACK terms R_BRACK initialization {printf("statement -> ARRAY L_BRACK terms R_BRACK initialization\n");}
          ;
-
-make_array: ARRAY L_BRACK array_initialize_or_assign SEMICOLON {printf("make_array -> ARRAY L_BRACK array_initialize_or_assign  SEMICOLON\n");}
-     ;
-
-array_initialize_or_assign:numbers R_BRACK {printf("array_initialize_or_assign -> numbers R_BRACK\n");}
-                          | NUMBER R_BRACK initialization {printf("array_initialize_or_assign -> NUMBER R_BRACK initialization\n");}
-                          ;
 
 numbers: NUMBER {printf("numbers -> NUMBER\n");}
        |NUMBER SEMICOLON numbers {printf("numbers -> NUMBER SEMICOLON numbers\n");}
