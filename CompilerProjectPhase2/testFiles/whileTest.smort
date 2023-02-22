@@ -3,7 +3,7 @@
 int x = 1;
 int y = 100;
 int a = 1;
-while(y > 0) {
+while(y > 0) && (x > 0) {
     while(x > 1) {
         if(x == 10) {
             write(x);
