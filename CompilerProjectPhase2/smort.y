@@ -41,9 +41,19 @@ statement:variable_declaration SEMICOLON {printf("statement -> variable_declarat
          |WHILE condition L_BRACE statements R_BRACE {printf("statement -> WHILE condition L_BRACE statements R_BRACE\n");}
          |IF condition L_BRACE statements R_BRACE branch {printf("statement -> IF condition L_BRACE statements R_BRACE branch\n");}
          |WHILEO L_BRACE statements R_BRACE WHILE condition {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
-         |RETURN term SEMICOLON {printf("statement -> RETURN term SEMICOLON\n");}
-         |ARRAY L_BRACK terms R_BRACK initialization SEMICOLON{printf("statement -> ARRAY expression SEMICOLON\n");}
+         |make_array {printf("statement -> make_array\n");}
          ;
+
+make_array: ARRAY L_BRACK array_initialize_or_assign SEMICOLON {printf("make_array -> ARRAY L_BRACK array_initialize_or_assign  SEMICOLON\n");}
+     ;
+
+array_initialize_or_assign:numbers R_BRACK {printf("array_initialize_or_assign -> numbers R_BRACK\n");}
+                          | NUMBER R_BRACK initialization {printf("array_initialize_or_assign -> NUMBER R_BRACK initialization\n");}
+                          ;
+
+numbers: NUMBER {printf("numbers -> NUMBER\n");}
+       |NUMBER SEMICOLON numbers {printf("numbers -> NUMBER SEMICOLON numbers\n");}
+       ;
 
 branch: %empty {printf("branch -> empty\n");}
         |ELIF condition L_BRACE statements R_BRACE branch {printf("branch -> ELIF condition L_BRACE statements R_BRACE\n");}
@@ -63,7 +73,7 @@ initialization:%empty {printf("initialization -> empty\n");}
 
 r_of_equals: expression {printf("r_of_equals -> expression\n");}
            |function_call {printf("r_of_equals -> function_call\n");}
-           |ARRAY L_BRACK terms R_BRACK {printf("r_of_equals -> ARRAY expression\n");}
+           |ARRAY L_BRACK NUMBER R_BRACK {printf("r_of_equals -> ARRAY L_BRACK NUMBER r_BRACK\n");}
            ;
 
 function_call:IDENTIFIER L_PAREN args R_PAREN {printf("function_call -> IDENTIFIER L_PAREN args R_PAREN\n");}
@@ -108,9 +118,13 @@ terms: %empty {printf("terms -> empty\n");}
      |term COMMA {printf("terms -> term\n");}
      ;
 
-term: NUMBER {printf("term -> NUMBER\n");}
+term: sign NUMBER {printf("term -> NUMBER\n");}
     |IDENTIFIER {printf("term -> IDENTIFIER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
+    ;
+
+sign: %empty
+    |MINUS
     ;
 
 conditions: condition conditions {printf("conditions -> condition conditions\n");}
@@ -147,7 +161,7 @@ void main (int argc, char** argv)
   }
   yyparse();
 }
-int yyerror(char *s)
+int yyerror()
 {
-  fprintf(stderr, "INVALID SYNTAX: %s\n",s);
+  fprintf(stderr, "INVALID SYNTAX\n");
 }
