@@ -21,16 +21,16 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
           {printf("function -> FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN returns SEMICOLON R_BRACE\n");}
         ;
 
-returns: return returns {printf("returns -> term returns\n");}
-        |return addop returns
-        |return mulop returns
-        |%empty
+returns: return returns {printf("returns -> return returns\n");}
+        |return addop returns {printf("returns -> return addop returns\n");}
+        |return mulop returns {printf("returns -> return mulop returns\n");}
+        |%empty {printf("returns -> empty\n");}
         ;
 
-return:term
-      |function_call
+return:term {printf("return -> term\n");}
+      |function_call {printf("return -> function_call\n");}
       ;
-      
+
 arguments:argument {printf("arguments -> argument\n");}
          |argument COMMA arguments {printf("arguments -> argument COMMA arguments\n");}
          ;
