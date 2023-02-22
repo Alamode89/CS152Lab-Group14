@@ -50,14 +50,14 @@ statements:%empty {printf("statements -> empty\n");}
 statement:variable_declaration {printf("statement -> variable_declaration\n");}
          |read {printf("statement -> read\n");}
          |write {printf("statement -> write\n");}
-         |WHILE condition L_BRACE statements R_BRACE {printf("statement -> WHILE conditions L_BRACE statements R_BRACE\n");}
-         |IF condition L_BRACE statements R_BRACE branch {printf("statement -> IF condition L_BRACE statements R_BRACE branch\n");}
-         |WHILEO L_BRACE statements R_BRACE WHILE condition {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
+         |WHILE conditions L_BRACE statements R_BRACE {printf("statement -> WHILE conditions L_BRACE statements R_BRACE\n");}
+         |IF conditions L_BRACE statements R_BRACE branch {printf("statement -> IF conditions L_BRACE statements R_BRACE branch\n");}
+         |WHILEO L_BRACE statements R_BRACE WHILE conditions {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
          |ARRAY L_BRACK terms R_BRACK initialization {printf("statement -> ARRAY expression\n");}
          ;
 
 branch: %empty {printf("branch -> empty\n");}
-        |ELIF condition L_BRACE statements R_BRACE branch {printf("branch -> ELIF condition L_BRACE statements R_BRACE\n");}
+        |ELIF conditions L_BRACE statements R_BRACE branch {printf("branch -> ELIF conditions L_BRACE statements R_BRACE\n");}
         |ELSE L_BRACE statements R_BRACE {printf("branch -> ELSE L_BRACE statements R_BRACE\n");}
         ;
 
@@ -121,9 +121,12 @@ term: NUMBER {printf("term -> NUMBER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
     ;
 
-conditions: condition conditions {printf("conditions -> condition conditions\n");};
+conditions: condition {printf("conditions -> condition conditions\n");}
+          |condition AND conditions {printf("conditions -> AND conditions\n");}
+          |condition OR conditions {printf("conditions -> OR conditions\n");}
+          ;
 
-condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN\n");}
+condition: L_PAREN bool_statement R_PAREN {printf("condition -> L_PAREN bool_statement R_PAREN\n");};
 
 bool_statement: term GREATER_THAN term {printf("bool_statement -> term GREATER_THAN term\n");}
               | term LESS_THAN term {printf("bool_statement -> term LESS_THAN term\n");}
