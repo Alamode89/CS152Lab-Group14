@@ -7,4 +7,4 @@ write(y); //should print out 10
 x = x / y
 write(x); //should print out 14
 y = 5 * 5
-write(y) //should print out 25
+write(y); //should print out 25
