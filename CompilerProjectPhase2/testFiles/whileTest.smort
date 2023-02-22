@@ -2,15 +2,17 @@
 
 int x = 1;
 int y = 100;
-int a = -1;
-while (y > 0 && y < 100) {
-    if(x == 10) {
+int a = 1;
+while(y > 0) {
+    while(x > 1) {
+        if(x == 10) {
+            write(x);
+        }
+        else {
+            write(a);
+        }
         write(x);
+        y = y - 1;
+        write(y);
     }
-    else {
-        write(a);
-    }
-    write(x);
-    y = y - 1;
-    write(y);
 }
