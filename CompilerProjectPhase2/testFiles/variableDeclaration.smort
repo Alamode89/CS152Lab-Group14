@@ -1,6 +1,6 @@
 func int factorial(int x) {
   x = 5+3;
-  return x * y;
+  return x * factorial(x-1);
 }
 
 int b = 5;
