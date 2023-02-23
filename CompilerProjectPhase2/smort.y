@@ -53,7 +53,7 @@ statement:variable_declaration {printf("statement -> variable_declaration\n");}
          |WHILE conditions L_BRACE statements R_BRACE {printf("statement -> WHILE conditions L_BRACE statements R_BRACE\n");}
          |IF conditions L_BRACE statements R_BRACE branch {printf("statement -> IF conditions L_BRACE statements R_BRACE branch\n");}
          |WHILEO L_BRACE statements R_BRACE WHILE conditions {printf("statement -> WHILEO conditions L_BRACE statements R_BRACE WHILE condition\n");}
-         |ARRAY L_BRACK terms R_BRACK initialization{printf("statement -> ARRAY expression\n");}
+         |ARRAY L_BRACK terms R_BRACK initialization{printf("statement -> ARRAY L_BRACK terms R_BRACK initialization\n");}
          ;
 
 branch: %empty {printf("branch -> empty\n");}
@@ -75,7 +75,7 @@ initialization:%empty {printf("initialization -> empty\n");}
 
 r_of_equals: expression {printf("r_of_equals -> expression\n");}
            |function_call {printf("r_of_equals -> function_call\n");}
-           |ARRAY L_BRACK terms R_BRACK initialization{printf("r_of_equals -> ARRAY L_BRACK NUMBER r_BRACK\n");}
+           |ARRAY L_BRACK terms R_BRACK initialization{printf("r_of_equals -> ARRAY L_BRACK NUMBER R_BRACK initialization\n");}
            ;
 
 function_call:IDENTIFIER L_PAREN args R_PAREN {printf("function_call -> IDENTIFIER L_PAREN args R_PAREN\n");}
@@ -119,12 +119,12 @@ terms: %empty {printf("terms -> empty\n");}
 term: sign NUMBER {printf("term -> NUMBER\n");}
     |IDENTIFIER {printf("term -> IDENTIFIER\n");}
     |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
-    |ARRAY L_BRACK terms R_BRACK {printf("term -> ARRAY expression\n");}
+    |ARRAY L_BRACK terms R_BRACK {printf("term -> ARRAY L_BRACK terms R_BRACK\n");}
     ;
 
 
-sign: %empty
-    |MINUS
+sign: %empty {printf("sign -> empty\n");}
+    |MINUS {printf("sign -> MINUS\n");}
     ;
           
 conditions: condition {printf("conditions -> condition\n");}
