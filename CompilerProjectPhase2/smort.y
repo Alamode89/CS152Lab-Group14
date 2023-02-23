@@ -83,7 +83,7 @@ function_call:IDENTIFIER L_PAREN args R_PAREN {printf("function_call -> IDENTIFI
 
 args: %empty {printf("args -> empty\n");}
     |IDENTIFIER mlt_args {printf("args -> IDENTIFIER mlt_args\n");}
-    |expression mlt_args{printf("args -> expression\n");}
+    |expression mlt_args{printf("args -> expression mlt_args\n");}
     ;
 
 mlt_args:%empty {printf("mlt_args -> empty\n");}
