@@ -3,11 +3,7 @@
 int x = 1;
 int y = 100;
 int a = 1;
-<<<<<<< HEAD
-while (y > 0) {
-    if(x == 10) {
-=======
-while(y > 0) {
+while(y > 0) && (x > 0) {
     while(x > 1) {
         if(x == 10) {
             write(x);
@@ -15,19 +11,8 @@ while(y > 0) {
         else {
             write(a);
         }
->>>>>>> 5a50237508ca3ef156ebdca33585f9f152bc2db1
         write(x);
         y = y - 1;
         write(y);
     }
-<<<<<<< HEAD
-    else {
-        write(a);
-    }
-    write(x);
-    y = y - 1;
-    write(y);
 }
-=======
-}
->>>>>>> 5a50237508ca3ef156ebdca33585f9f152bc2db1

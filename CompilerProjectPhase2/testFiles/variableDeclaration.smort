@@ -1,13 +1,6 @@
-<<<<<<< HEAD
-func int test()
-{
-  int x = y + 7;
-  return x;
-=======
 func int factorial(int x) {
   x = 5+3;
   return x * y;
->>>>>>> 5a50237508ca3ef156ebdca33585f9f152bc2db1
 }
 
 int b = 5;
