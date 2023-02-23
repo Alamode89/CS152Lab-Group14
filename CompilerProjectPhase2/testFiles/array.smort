@@ -2,7 +2,7 @@
 this is testing arrays
 */
 
-int a = arr[8];
+int a = arr[5];
 int x;
 int y;
 
@@ -19,3 +19,5 @@ write(arr[2]); //should print out 50
 
 arr[3] = arr[0];
 write(arr[3]); //should print 28
+
+arr[3] = arr[0] * (arr[1] + 5);
