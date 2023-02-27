@@ -1,0 +1,6 @@
+int x = 525;
+int x = x + 43;
+int val4 = 0;
+while(val4 < 20) {
+  val4 = val4 + 1;
+}
