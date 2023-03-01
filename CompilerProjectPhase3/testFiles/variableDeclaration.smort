@@ -3,8 +3,11 @@ func int factorial(int x) {
   return x * factorial(x-1, y);
 }
 
+main
+{
 int b = 5;
 int x = 3;
 int w = b+x;
 read(b);
 x = z(b, x);
+}
