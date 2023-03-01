@@ -33,7 +33,7 @@ main:MAIN L_BRACE statements R_BRACE {printf("main -> MAIN L_BRACE statements R_
     ;
 
 statements:%empty {printf("statements -> empty\n");}
-          |statement statements {printf("statemetns -> statement statements\n");}
+          |statement statements {printf("statements -> statement statements\n");}
           ;
 
 statement:variable_declaration SEMICOLON{printf("statement -> variable_declaration SEMICOLON\n");}
