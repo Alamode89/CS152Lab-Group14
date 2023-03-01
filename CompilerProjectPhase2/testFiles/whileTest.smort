@@ -1,9 +1,10 @@
 //this file is for testing loops and its conditions and statements within
-
+main
+{
 int x = 1;
 int y = 100;
 int a = 1;
-while(y > 0) && (x > 0) {
+while(y > 0 && x > 0) {
     while(x > 1) {
         if(x == 10) {
             write(x);
@@ -15,4 +16,5 @@ while(y > 0) && (x > 0) {
         y = y - 1;
         write(y);
     }
+}
 }
