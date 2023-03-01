@@ -1,20 +1,8 @@
 %{
   #include <stdio.h>
   #include <stdlib.h>
-  #include <map>
-  #include <set>
   #include <string.h>
-  #include <iostream>
-  #include <sstream>
-  #include <algorithm>
-  using namespace std;
-
-
-  set<string> reserved = {"INTEGER", "WHILE", "WHILEO", "BREAK", "READ", "WRITE", "FUNCTION", "RETURN", "ARRAY", "IDENTIFIER", "MAIN", "NUMBER", 
-    "PLUS", "MINUS", "MULT", "DIV", "L_PAREN", "R_PAREN", "EQUAL", "LESS_THAN", "GREATER_THAN", "NOT", "NOT_EQUAL", "GTE", "LTE", "EQUAL_TO", 
-    "AND", "OR", "TRUE", "FALSE", "L_BRACE", "R_BRACE", "SEMICOLON", "COMMA", "L_BRACK", "R_BRACK", "IF", "ELSE", "ELIF", "main", "func", "if", "elif", "else",
-    "while", "whileo", "read", "write", "and", "or"};
-
+  
   extern FILE* yyin;
 %}
 
