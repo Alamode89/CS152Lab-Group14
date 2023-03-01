@@ -73,3 +73,5 @@ Table for the symbols in our language and their token name:
 | write  	| WRITE  	|
 | func  	| FUNCTION  |
 | return  	| RETURN  	|
+| main  	| MAIN  	|
+
