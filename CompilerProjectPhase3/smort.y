@@ -10,121 +10,120 @@
 
 %%
 
-prog_start:functions main {printf("prog_start -> functions main\n");}
+prog_start:functions main
           ;
 
-functions: %empty {printf("functions -> empty\n");}
-         |function functions {printf("functions -> function functions\n");}
+functions: %empty
+         |function functions
          ;
 
 function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE
-            {printf("function -> FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE\n");}
           ;
 
-arguments: argument {printf("arguments -> argument\n");}
-         |argument COMMA arguments {printf("arguments -> argument COMMA arguments\n");}
+arguments: argument
+         |argument COMMA arguments 
          ;
 
-argument:%empty {printf("argument -> empty\n");}
-        |INTEGER IDENTIFIER {printf("argument -> INTEGER IDENTIFIER\n");}
+argument:%empty
+        |INTEGER IDENTIFIER
         ;
 
-main:MAIN L_BRACE statements R_BRACE {printf("main -> MAIN L_BRACE statements R_BRACE\n");}
+main:MAIN L_BRACE statements R_BRACE 
     ;
 
-statements:%empty {printf("statements -> empty\n");}
-          |statement statements {printf("statement -> statement statements\n");}
+statements:%empty
+          |statement statements
           ;
 
-statement:variable_declaration SEMICOLON{printf("statement -> variable_declaration SEMICOLON\n");}
-         |read SEMICOLON {printf("statement -> read SEMICOLON\n");}
-         |write SEMICOLON {printf("statement -> write SEMICOLON\n");}
-         |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE {printf("statement -> WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE\n");}
-         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch {printf("statement -> IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch\n");}
-         |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN {printf("statement -> WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN\n");}
-         |ARRAY L_BRACK array_terms R_BRACK initialization SEMICOLON {printf("statement -> ARRAY L_BRACK array_terms R_BRACK initialization SEMICOLON\n");}
+statement:variable_declaration SEMICOLON
+         |read SEMICOLON 
+         |write SEMICOLON 
+         |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
+         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
+         |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
+         |ARRAY L_BRACK array_terms R_BRACK initialization SEMICOLON
          ;
 
-branch: %empty {printf("branch -> empty\n");}
-      |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch {printf("branch -> ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch\n");}
-      |ELSE L_BRACE statements R_BRACE {printf("branch -> ELSE L_BRACE statements R_BRACE\n");}
+branch: %empty
+      |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
+      |ELSE L_BRACE statements R_BRACE
       ;
 
-variable_declaration: prefix IDENTIFIER initialization {printf("variable_declaration -> prefix IDENTIFIER initialization\n");}
+variable_declaration: prefix IDENTIFIER initialization
                     ;
 
-prefix: %empty {printf("prefix -> empty\n");}
-      |INTEGER {printf("prefix -> INTEGER\n");}
+prefix: %empty
+      |INTEGER
       ;
 
-initialization:%empty {printf("initialization -> empty\n");}
-              |EQUAL expression {printf("initialization -> EQUAL expression\n");}
+initialization:%empty
+              |EQUAL expression 
               ;
 
-read:READ L_PAREN IDENTIFIER R_PAREN {printf("read -> READ L_PAREN IDENTIFIER R_PAREN\n");}
+read:READ L_PAREN IDENTIFIER R_PAREN 
     ;
 
-write:WRITE L_PAREN expression R_PAREN {printf("write -> WRITE L_PAREN expression R_PAREN\n");}
+write:WRITE L_PAREN expression R_PAREN
      ;
 
-expression: expression addop multerm {printf("expression -> expression addop multerm\n");}
-          |multerm {printf("expression -> multerm\n");}
+expression: expression addop multerm 
+          |multerm 
           ;
 
-addop: PLUS {printf("addop -> PLUS\n");}
-     |MINUS {printf("addop -> MINUS\n");}
+addop: PLUS 
+     |MINUS 
      ;
 
-multerm: multerm mulop term {printf("multerm -> multerm mulop term\n");}
-       |term {printf("multerm -> term\n");}
+multerm: multerm mulop term 
+       |term 
        ;
 
-mulop: MULT {printf("mulop -> MULT\n");} 
-     |DIV {printf("mulop -> DIV\n");}
+mulop: MULT 
+     |DIV 
      ;
 
-term: sign NUMBER {printf("term -> NUMBER\n");}
-    |IDENTIFIER {printf("term -> IDENTIFIER\n");}
-    |L_PAREN expression R_PAREN {printf("term -> L_PAREN expression R_PAREN\n");}
-    |ARRAY L_BRACK NUMBER R_BRACK {printf("term -> ARRAY L_BRACK NUMBER R_BRACK\n");}
-    |IDENTIFIER L_PAREN args R_PAREN {printf("term -> IDENTIFIER L_PAREN args R_PAREN\n");}
+term: sign NUMBER 
+    |IDENTIFIER 
+    |L_PAREN expression R_PAREN 
+    |ARRAY L_BRACK NUMBER R_BRACK 
+    |IDENTIFIER L_PAREN args R_PAREN
     ;
 
-args:%empty {printf("args -> empty\n");}
-    |mlt_args {printf("args -> mlt_args\n");}
+args:%empty 
+    |mlt_args 
     ;
 
-mlt_args:expression {printf("mlt_args -> expression\n");}
-        |expression COMMA mlt_args {printf("mlt_args -> expression COMMA mlt_args\n");}
+mlt_args:expression 
+        |expression COMMA mlt_args 
         ;
 
-sign: %empty {printf("sign -> empty\n");}
-    |MINUS {printf("sign -> MINUS\n");}
+sign: %empty 
+    |MINUS 
     ;
 
-conditions: condition {printf("conditions -> condition\n");}
-          |condition AND conditions {printf("conditions -> condition AND conditions\n");}
-          |condition OR conditions {printf("conditions -> condition OR conditions\n");}
+conditions: condition 
+          |condition AND conditions 
+          |condition OR conditions 
           ;
 
-condition: bool_statement {printf("condition -> bool_statement\n");}
+condition: bool_statement 
          ;
 
-bool_statement: term bool_operation term {printf("bool_statement -> term bool_operation term\n");}
-              |TRUE {printf("bool_statement -> TRUE\n");}
-              |FALSE {printf("bool_statement -> FALSE\n");}
+bool_statement: term bool_operation term 
+              |TRUE 
+              |FALSE 
               ;
 
-bool_operation: GREATER_THAN {printf("bool_operation -> GREATER_THAN\n");}
-              |LESS_THAN {printf("bool_operation -> LESS_THAN\n");}
-              |GTE {printf("bool_operation -> GTE\n");}
-              |LTE {printf("bool_operation -> LTE\n");}
-              |EQUAL_TO {printf("bool_opertaion -> EQUAL_TO\n");}
-              |NOT_EQUAL {printf("bool_operation -> NOT_EQUAL\n");}
+bool_operation: GREATER_THAN 
+              |LESS_THAN 
+              |GTE 
+              |LTE 
+              |EQUAL_TO 
+              |NOT_EQUAL 
               ;
 
-array_terms: NUMBER {printf("array_terms -> NUMBER\n");}
-           | NUMBER COMMA array_terms {printf("array_terms -> NUMBER COMMA array_terms\n");}
+array_terms: NUMBER 
+           | NUMBER COMMA array_terms
            ;
 
 %%
