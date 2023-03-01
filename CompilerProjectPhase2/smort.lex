@@ -46,6 +46,7 @@ write               {col+=5;return WRITE;}
 func                {col+=4;return FUNCTION;}
 return              {col+= 6;return RETURN;}
 arr                 {col+=3;return ARRAY;}
+main                {col+=4;return MAIN;}
 {IDENTIFIER}        {col += yyleng;return IDENTIFIER;}
 TRUE                {col+=4;return TRUE;}
 FALSE               {col+=5;return FALSE;}

@@ -2,18 +2,20 @@
 this is testing the block comment
 that spans across multiple lines
 */
-
+main
+{
 int x = 9;
 int y = 25;
 
-if(x > y) && (y < 100) {
+if(x > y && y < 100) {
   write(x);
 } 
 
-elif(y > x) || (x < 100) && (x > 5) {
+elif(y > x || x < 100 && x > 5) {
     write(y);
 } 
 
 else {
     write(x);
+}
 }
