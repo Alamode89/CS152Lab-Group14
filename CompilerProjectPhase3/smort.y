@@ -72,7 +72,6 @@ void print_symbol_table(void){
   printf("--------------------\n");
 }
 
-void yyerror(const char *msg);
 %}
 
 %union{
@@ -260,17 +259,16 @@ array_terms: NUMBER
 
 %%
 
-int main ()
-{
+int main (int argc, char** argv) {
   yyin = stdin;
-  do{
+
+  do {
     yyparse();
   } while(!feof(yyin));
-  
   return 0;
 }
-void yyerror(const char *msg)
-{
+
+void yyerror(const char *msg) {
   printf("**  Line %d: %s\n", row, msg);
   exit(1);
 }
