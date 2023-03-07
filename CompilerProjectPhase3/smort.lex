@@ -1,6 +1,10 @@
+%option noyywrap
+
 %{
 #include <stdio.h>
 #include "y.tab.h"
+#define YY_DECL int yylex(void)
+
 int row = 1;
 int col = 1;
 %}
