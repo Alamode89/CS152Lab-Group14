@@ -3,7 +3,11 @@
   #include <stdlib.h>
   #include <string.h>
   
+  extern int yylex(void);
+  extern int yyparse();
   extern FILE* yyin;
+  void yyerror(const char *msg);
+
 %}
 
 %start prog_start
@@ -131,21 +135,16 @@ array_terms: NUMBER
 
 %%
 
-void main (int argc, char** argv)
-{
-  if(argc >= 2)
-  {
-    yyin = fopen(argv[1], "r");
-    if(yyin == NULL)
-      yyin = stdin;
-  }
-  else
-  {
-    yyin = stdin;
-  }
-  yyparse();
+int main (int argc, char** argv) {
+  yyin = stdin;
+
+  do {
+    yyparse();
+  } while(!feof(yyin));
+  return 0;
 }
-int yyerror()
-{
+
+void yyerror(const char *msg) {
   fprintf(stderr, "INVALID SYNTAX\n");
+  exit(1);
 }
