@@ -17,7 +17,8 @@ char *identToken;
 int numberToken;
 int count_names = 0;
 
-enum Type {Intiger, Array};
+/*
+enum Type {Integer, Array};
 struct Symbol{
   std::string name;
   Type type;
@@ -71,37 +72,38 @@ void print_symbol_table(void){
   }
   printf("--------------------\n");
 }
-
+*/
 %}
 
 %union{
-  struct CodeNode *code_node;
   char *op_val;
   int int_val;
+
+  struct S{
+    char *code;
+  } statement;
+
+  struct E{
+    char *place;
+    char *code;
+  } expression;
 }
 
+%type <CodeNode> functions main statements term expression multerm initialization variable_declaration statement sign
+
 %start prog_start
-%token NUMBER PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
+%token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
+%token <op_val>NUMBER
 %token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY 
 %token <op_val>IDENTIFIER /*had to make the identifier token an op_val this fixed an error I was having*/
-%token MAIN
-
-/*%type <code_node> functions
-%type <code_node> function
-%type <code_node> statements
-%type <code_node> statement
-%type <code_node> arguments
-%type <code_node> argument*/
-%type <code_node> variable_declaration
+%token <op_val>MAIN
 
 %%
 
-prog_start:functions main{
-
-          /*CodeNode *code_node = $1;
-          printf("%s\n", code_node->code.c_str());*/
+prog_start:functions main {
+  //printf("%s", $2->name);
 }
-          ;
+;
 
 functions: %empty{
           
@@ -118,7 +120,7 @@ functions: %empty{
 }
          ;
 
-function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE{
+function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
         
           /*CodeNode *node = new CodeNode;
           std::string func_name = $3;
@@ -148,14 +150,30 @@ argument:%empty
         |INTEGER IDENTIFIER
         ;
 
-main:MAIN L_BRACE statements R_BRACE 
-    ;
+main:IDENTIFIER L_BRACE statements R_BRACE 
+  {
+    //CodeNode* node = new CodeNode;
+    //node->code = "";
+    //node->name = $1;
+    printf("%s\n", "hi");
+    //printf("%s\n", node->name.c_str());
+    //$$ = node;
+    //printf("%s", $3.code);
+   // printf("%s", $3.place);
+  }
+;
 
 statements:%empty
-          |statement statements
+          |statement statements {
+              //$$.place = $1.place;
+              //$$.code = $1.code;
+          }
           ;
 
-statement:variable_declaration SEMICOLON
+statement:variable_declaration SEMICOLON {
+  //$$.place = $1.place;
+  //$$.code = $1.code;
+}
          |read SEMICOLON 
          |write SEMICOLON 
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
@@ -169,17 +187,13 @@ branch: %empty
       |ELSE L_BRACE statements R_BRACE
       ;
 
-variable_declaration: prefix IDENTIFIER initialization{
-                    
-                    CodeNode *code_node = new CodeNode;
-                    CodeNode *code_node2 = new CodeNode;
-                    code_node2 = $3;
-                    std::string id = $2;
-                    code_node->code = std::string(". ") + id + std::string("\n");
-                    code_node->code = std::string ("= ") + code_node2->code + std::string("\n");
-                    $$ = code_node;
+variable_declaration: prefix IDENTIFIER initialization
+{
+  //printf("%s", $2);
+  //$$.place = strdup("1");
+  //$$.code = strdup("2");
 }
-                    ;
+;
 
 prefix: %empty{
 
@@ -188,7 +202,10 @@ prefix: %empty{
       ;
 
 initialization:%empty
-              |EQUAL expression 
+              |EQUAL expression {
+                //printf("%s", $2.code);
+                //$$.code = strdup($2.code);
+              }
               ;
 
 read:READ L_PAREN IDENTIFIER R_PAREN 
@@ -198,7 +215,10 @@ write:WRITE L_PAREN expression R_PAREN
      ;
 
 expression: expression addop multerm 
-          |multerm 
+          |multerm {
+            //printf("%s", $1.code);
+            //$$.code = strdup($1.code);
+          }
           ;
 
 addop: PLUS 
@@ -206,14 +226,22 @@ addop: PLUS
      ;
 
 multerm: multerm mulop term 
-       |term 
+       |term {
+        //$$.code = strdup($1.code);
+       }
        ;
 
 mulop: MULT 
      |DIV 
      ;
 
-term: sign NUMBER
+term: sign NUMBER {
+  //printf("%d", $2);
+  //char str[20];
+  //snprintf(str, sizeof(str),"%d", $2);
+  //printf("%s", str);
+  //$$.code = strdup("hi");
+}
     |IDENTIFIER 
     |L_PAREN expression R_PAREN 
     |ARRAY L_BRACK NUMBER R_BRACK 
