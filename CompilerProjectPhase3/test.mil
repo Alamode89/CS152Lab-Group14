@@ -1,0 +1,9 @@
+func main
+. x
+. y
+. z
+= x, 5
+= y, 2
+.< y
+.> x
+endfunc
