@@ -20,17 +20,25 @@ int count_names = 0;
 
 
 enum Type {Integer, Array};
-struct Symbol{
+struct Variable{
   std::string name;
   Type type;
 };
 struct Function {
   std::string name;
-  std::vector<Symbol> declarations;
+  std::vector<Variable> declarations;
 };
 
 std::vector <Function> symbol_table;
 
+bool foundInVec(std::vector<Variable> vec, std::string& value) {
+  for (int i = 0; i < vec.size(); i++) {
+    if (vec.at(i).name == value) {
+      return true;
+    }
+  }
+  return false;
+}
 
 Function *get_function(){
   int last = symbol_table.size()-1;
@@ -40,7 +48,7 @@ Function *get_function(){
 bool find(std::string &value){
   Function *f = get_function();
   for(int i = 0; i < f->declarations.size(); i++) {
-    Symbol *s = &f->declarations[i];
+    Variable *s = &f->declarations[i];
     if(s->name == value){
       return true;
     }
@@ -55,7 +63,7 @@ void add_function_to_symbol_table(std::string &value) {
 }
 
 void add_variable_to_symbol_table(std::string &value, Type t) {
-  Symbol s;
+  Variable s;
   s.name = value;
   s.type = t;
   Function *f = get_function();
