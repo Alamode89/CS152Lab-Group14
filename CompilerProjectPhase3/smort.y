@@ -221,7 +221,12 @@ input_output: read_write L_PAREN IDENTIFIER R_PAREN SEMICOLON {
   $$->code = rw + std::string(" ") + variable + std::string("\n");
 }
 
-read_write: READ
+read_write: READ {
+  $$ = new CodeNode();
+  char e[] = ".<";
+  $$->name = e;
+}
+
 |WRITE {
   $$ = new CodeNode();
   char e[] = ".>";
