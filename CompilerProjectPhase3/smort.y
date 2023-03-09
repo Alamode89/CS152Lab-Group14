@@ -74,6 +74,13 @@ void print_symbol_table(void){
   printf("--------------------\n");
 }
 
+std::string temp_var_incrementer(){
+  std::stringstream new_temp_var;
+  new_temp_var << std::string("temp_") << count_names;
+  ++count_names;
+  return new_temp_var.str();
+}
+
 %}
 
 %union{
@@ -92,8 +99,8 @@ void print_symbol_table(void){
   } expression;
 }
 
-%type <node> functions main statements term expression multerm initialization variable_declaration statement sign var_assignment
-%type <node> input_output read_write
+%type <node> functions main statements term expression initialization variable_declaration statement sign var_assignment
+%type <node> input_output read_write operation
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -238,27 +245,44 @@ read_write: READ {
     ;*/
 
 
-expression: expression addop multerm 
-          |multerm {
-            CodeNode* node = new CodeNode;
-            node->code = $1->code;
-            node->name = $1->name;
-            $$ = node;
-           // delete $1;
-          }
-          ;
+expression: term operation expression {
+  std::string last = $1->name;
+  std::string first = $3->name;
 
-addop: PLUS 
-     |MINUS 
-     ;
+  delete $1;
+  delete $3;
 
-multerm: multerm mulop term 
-       |term 
-       ;
+  $$ = new CodeNode();
+  std::string temp = temp_var_incrementer();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(" ") + last + std::string(" ") + first + std::string("\n");
+}
+|term
+;
 
-mulop: MULT 
-     |DIV 
-     ;
+operation: PLUS {
+  $$ = new CodeNode();
+  char e[] = "+";
+  $$->name = e;
+}
+|MINUS {
+  $$ = new CodeNode();
+  char e[] = "-";
+  $$->name = e;
+}
+|MULT {
+  $$ = new CodeNode();
+  char e[] = "*";
+  $$->name = e;
+}
+|DIV {
+  $$ = new CodeNode();
+  char e[] = "/";
+  $$->name = e;
+}
+;
+
 
 term: sign NUMBER {
     $$ = new CodeNode();
