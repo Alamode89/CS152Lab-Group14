@@ -170,18 +170,14 @@ main:MAIN L_BRACE statements R_BRACE
 statements:%empty
           |statement statements {
             CodeNode* node = new CodeNode;
-            node->code = $1->code;
+            node->code = $1->code + $2->code;
             $$ = node;
             delete $1;
+            delete $2;
           }
           ;
 
-statement:variable_declaration SEMICOLON {
-    CodeNode* node = new CodeNode;
-    node->code = $1->code;
-    $$ = node;
-   // delete $1;
-}
+statement:variable_declaration SEMICOLON 
          |read SEMICOLON 
          |write SEMICOLON 
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
@@ -201,10 +197,10 @@ variable_declaration: prefix IDENTIFIER initialization
   std::string var_name = $2;
   add_variable_to_symbol_table(var_name, t);
   CodeNode* node = new CodeNode;
+  node->code += std::string(". ") + var_name + std::string("\n");
   node->code += std::string("= ") +  var_name + std::string(", ") + $3->code;
   $$ = node;
   delete $2;
-  delete $3;
 }
 ;
 
