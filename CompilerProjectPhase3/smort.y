@@ -90,6 +90,16 @@ void checkVarDuplicate(const std::string val) {
   }
 }
 
+void checkFuncDef(const std::string val){
+  for (int i = 0; i < symbol_table.size(); i++){
+    if (symbol_table.at(i).name == val){
+      return;
+    }
+  }
+  std::string msg = "Error: function '" + val + "' undefined";
+  yyerror(msg.c_str());
+}
+
 %}
 
 %union{
