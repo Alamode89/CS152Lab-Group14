@@ -7,6 +7,7 @@
   #include <vector>
   #include <string>
   #include "y.tab.h"
+  #include <cstdlib>
   extern FILE* yyin;
   //Below code is from practice lab 3
   extern int yylex(void); //new line
@@ -41,15 +42,15 @@ bool foundInVec(std::vector<Variable> vec, std::string& value) {
 }
 
 Function *get_function(){
-  int last = symbol_table.size()-1;
-  return &symbol_table[last];
+  int final = symbol_table.size()-1;
+  return &symbol_table[final];
 }
 
-bool find(std::string &value){
+bool find(const std::string &value){
   Function *f = get_function();
   for(int i = 0; i < f->declarations.size(); i++) {
-    Variable *s = &f->declarations[i];
-    if(s->name == value){
+    Variable *v = &f->declarations[i];
+    if(v->name == value){
       return true;
     }
   }
@@ -63,11 +64,11 @@ void add_function_to_symbol_table(std::string &value) {
 }
 
 void add_variable_to_symbol_table(std::string &value, Type t) {
-  Variable s;
-  s.name = value;
-  s.type = t;
+  Variable v;
+  v.name = value;
+  v.type = t;
   Function *f = get_function();
-  f->declarations.push_back(s);
+  f->declarations.push_back(v);
 }
 
 void print_symbol_table(void){
@@ -80,6 +81,13 @@ void print_symbol_table(void){
     }
   }
   printf("--------------------\n");
+}
+
+void checkVarDuplicate(const std::string val) {
+  if (find(val)) {
+    std::string msg = "Error: duplicate declaration of variable '" + val + "'";
+    yyerror(msg.c_str());
+  }
 }
 
 %}
@@ -203,6 +211,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 {
   Type t = Integer;
   std::string var_name = $2;
+  checkVarDuplicate(var_name);
   add_variable_to_symbol_table(var_name, t);
   CodeNode* node = new CodeNode;
   node->code = std::string(". ") + var_name + std::string("\n");
