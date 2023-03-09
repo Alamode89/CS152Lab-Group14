@@ -4,12 +4,15 @@
 #include <stdio.h>
 #include <string.h>
 #include "y.tab.h"
-#define YY_DECL int yylex(void)
+#include <string.h>
+//#define YY_DECL int yylex(void)
 
 int row = 1;
 int col = 1;
+
 extern char *identToken;
 extern int numberToken;
+
 %}
 
 NUMBER [0-9]
@@ -69,6 +72,7 @@ main                {col+=4;return MAIN;}
     identToken = yytext;
     return IDENTIFIER;
 }
+
 TRUE                {col+=4;return TRUE;}
 FALSE               {col+=5;return FALSE;}
 " "                 {col++;}

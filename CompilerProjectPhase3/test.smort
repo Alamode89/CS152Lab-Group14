@@ -1,3 +1,13 @@
+func int tst1(int x){
+  x = 4;
+ return x;
+}
+
+func int tst2(int y){
+  y = 9;
+ return 9;
+}
+
 main {
     int x;
     int y;
