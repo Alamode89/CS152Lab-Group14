@@ -93,7 +93,7 @@ void print_symbol_table(void){
 }
 
 %type <node> functions main statements term expression multerm initialization variable_declaration statement sign var_assignment
-%type <node> input_output read_write
+%type <node> input_output read_write operation mulop
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -238,19 +238,34 @@ read_write: READ {
     ;*/
 
 
-expression: expression addop multerm 
-          |multerm {
-            CodeNode* node = new CodeNode;
-            node->code = $1->code;
-            node->name = $1->name;
-            $$ = node;
-           // delete $1;
-          }
-          ;
+expression: multerm operation expression {
+  std::string last = $3->name;
+  std::string first = $1->name;
 
-addop: PLUS 
-     |MINUS 
-     ;
+  delete $1;
+  delete $3;
+
+  $$ = new CodeNode();
+  $$->name = std::string("tem");
+  $$->code = std::string(". ") + std::string("tem") + std::string("\n");
+  $$->code += std::string($2->name) + std::string("tem") + last + first +std::string("\n");
+}
+|multerm {
+  CodeNode* node = new CodeNode;
+  node->code = $1->code;
+  node->name = $1->name;
+  $$ = node;
+  // delete $1;
+}
+;
+
+operation: PLUS {
+  $$ = new CodeNode();
+  char e[] = "+";
+  $$->name = e;
+}
+|MINUS 
+;
 
 multerm: multerm mulop term 
        |term 
