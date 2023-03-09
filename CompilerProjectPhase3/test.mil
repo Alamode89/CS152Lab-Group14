@@ -1,0 +1,17 @@
+func tst1
+. x
+= x, 4
+endfunc
+func tst2
+. y
+= y, 9
+endfunc
+func main
+. x
+. y
+. z
+= x, 5
+= y, 2
+.< y
+.> x
+endfunc
