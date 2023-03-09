@@ -1,6 +1,8 @@
 main {
     int x;
-    x = 5;
-    int a = arr[5];
-    a[0] = 5;
+    int y;
+
+    int z = arr[5];
+    a[0] = x + y;
+    write(a[0])
 }

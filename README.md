@@ -19,7 +19,7 @@ Examples of the above listed features are in the table below:
 | Language Feature | Code Example |
 | --- | --- |
 | Integer Scalar Variables | int a;<br>int b;|
-| One-Dimensional Arrays of Integers | arr[1,2,3,4,5,6,7,8,9];<br> arr[8] |
+| One-Dimensional Arrays of Integers | int a = arr[8]; |
 | Assignment Statements | a = 5;<br>b = 3;<br>c = b;|
 | Arithmetic Operators (e.g., "+", "-", "*", "/") | a = x + y;<br>b = x - y;<br>c = x * y;<br>d = x/y; |
 | Comparison Operators (e.g., “<”, “==”, “>”, “!=”) | a == y;<br>a < y;<br>a > y;<br>a != y; |

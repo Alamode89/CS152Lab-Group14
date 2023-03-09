@@ -74,6 +74,13 @@ void print_symbol_table(void){
   printf("--------------------\n");
 }
 
+std::string temp_var_incrementer(){
+  std::stringstream new_temp_var;
+  new_temp_var << std::string("_temp") << count_names;
+  ++count_names;
+  return new_temp_var.str();
+}
+
 %}
 
 %union{
@@ -92,8 +99,8 @@ void print_symbol_table(void){
   } expression;
 }
 
-%type <node> functions main statements term expression multerm initialization variable_declaration statement sign var_assignment
-%type <node> input_output read_write array_assignment array_declaration array_terms
+%type <node> functions main statements term expression variable_declaration statement sign var_assignment
+%type <node> input_output read_write array_assignment array_declaration array_terms operation
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -192,9 +199,8 @@ array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEM
   std::string arr_name = $2;
   add_variable_to_symbol_table(arr_name, t);
   std::string arr_size = $6->name;
-  CodeNode* node = new CodeNode();
-  node->code = std::string(".[] ") + arr_name + std::string(", ") + arr_size + std::string("\n");
-  $$ = node;
+  $$ = new CodeNode();
+  $$->code = std::string(".[] ") + arr_name + std::string(", ") + arr_size + std::string("\n");
 }
 ;
 
@@ -203,15 +209,12 @@ array_assignment: IDENTIFIER L_BRACK expression R_BRACK EQUAL expression SEMICOL
   std::string arr_index = $3->name;
   std::string value = $6->name;
   //check if it exists need helper functions
-  CodeNode* node = new CodeNode();
-  node->code = std::string("[]= ") + arr_name + std::string(", ") + arr_index + std::string(", ") + value + std::string("\n");
-  $$ = node;
+  $$ = new CodeNode();
+  $$->code = $6->code;
+  $$->code += std::string("[]= ") + arr_name + std::string(", ") + arr_index + std::string(", ") + value + std::string("\n");
 }
 ;
 
-int a = arr[5];
-a[1] = 1 + 4;
-a[1] = a[4] + 6
 branch: %empty
       |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
       |ELSE L_BRACE statements R_BRACE
@@ -238,10 +241,8 @@ var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   //$$ = node;
 }
 ;
-initialization: NUMBER 
-;
 
-input_output: read_write L_PAREN IDENTIFIER R_PAREN SEMICOLON {
+input_output: read_write L_PAREN expression R_PAREN SEMICOLON {
   std::string variable = $3;
   $$ = new CodeNode();
   std::string rw = $1->name;
@@ -261,27 +262,44 @@ read_write: READ {
 }
 
 
-expression: expression addop multerm 
-          |multerm {
-            CodeNode* node = new CodeNode;
-            node->code = $1->code;
-            node->name = $1->name;
-            $$ = node;
-           // delete $1;
-          }
-          ;
+expression: term operation expression {
+  std::string last = $1->name;
+  std::string first = $3->name;
+  std::string temp = temp_var_incrementer();
+  
+  delete $1;
+  delete $3;
 
-addop: PLUS 
-     |MINUS 
-     ;
+  $$ = new CodeNode();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(" ") + last + std::string(" ") + first + std::string("\n");
+}
+|term
+;
 
-multerm: multerm mulop term 
-       |term 
-       ;
+operation: PLUS {
+  $$ = new CodeNode();
+  char e[] = "+";
+  $$->name = e;
+}
+|MINUS {
+  $$ = new CodeNode();
+  char e[] = "-";
+  $$->name = e;
+}
+|MULT {
+  $$ = new CodeNode();
+  char e[] = "*";
+  $$->name = e;
+}
+|DIV {
+  $$ = new CodeNode();
+  char e[] = "/";
+  $$->name = e;
+}
+;
 
-mulop: MULT 
-     |DIV 
-     ;
 
 term: sign NUMBER {
     $$ = new CodeNode();
