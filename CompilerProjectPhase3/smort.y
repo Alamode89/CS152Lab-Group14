@@ -92,7 +92,7 @@ void print_symbol_table(void){
   } expression;
 }
 
-%type <node> functions main statements term expression multerm initialization variable_declaration statement sign
+%type <node> functions main statements term expression multerm initialization variable_declaration statement sign var_assignment
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -166,16 +166,18 @@ main:MAIN L_BRACE statements R_BRACE
   }
 ;
 
-statements:%empty
+statements: { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
           |statement statements {
             CodeNode* node = new CodeNode;
             node->code = $1->code + $2->code;
+            delete $1;
+            delete $2;
             $$ = node;
           }
           ;
 
 statement:variable_declaration
-         |initialization
+         |var_assignment
          |read SEMICOLON 
          |write SEMICOLON 
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
@@ -201,16 +203,15 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 }
 ;
 
-initialization: NUMBER {
-                  //std::string var_name = std::string("x");
-                  //std::string value = std::string("5");
-              //add checker function to see if variable exists
-              printf("%s","haha");
-                  //CodeNode* node = new CodeNode();
-                  //node->code = std::string("haha");
-                  //node->code = std::string("haha\n");
-                  //$$ = node;
-              }
+var_assignment: IDENTIFIER EQUAL term SEMICOLON{
+  std::string variable = $1;
+  std::string value = $3->name;
+  $$ = new CodeNode;
+  $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
+  //$$ = node;
+}
+;
+initialization: NUMBER 
 ;
 
 read:READ L_PAREN IDENTIFIER R_PAREN 
