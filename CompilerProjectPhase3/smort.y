@@ -246,9 +246,9 @@ expression: multerm operation expression {
   delete $3;
 
   $$ = new CodeNode();
-  $$->name = std::string("tem");
+  $$->name = std::string("tem"); //tems need helper func that incrementally creates new temp vars
   $$->code = std::string(". ") + std::string("tem") + std::string("\n");
-  $$->code += std::string($2->name) + std::string("tem") + last + first +std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + std::string("tem") + std::string(" ") + last + std::string(" ") + first + std::string("\n");
 }
 |multerm {
   CodeNode* node = new CodeNode;
@@ -264,7 +264,11 @@ operation: PLUS {
   char e[] = "+";
   $$->name = e;
 }
-|MINUS 
+|MINUS {
+  $$ = new CodeNode();
+  char e[] = "-";
+  $$->name = e;
+}
 ;
 
 multerm: multerm mulop term 
