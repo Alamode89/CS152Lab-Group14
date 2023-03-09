@@ -266,7 +266,7 @@ array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEM
 }
 ;
 
-array_assignment: IDENTIFIER L_BRACK expression R_BRACK EQUAL expression SEMICOLON {
+array_assignment: IDENTIFIER L_BRACK term R_BRACK EQUAL expression SEMICOLON {
   std::string arr_name = $1;
   std::string arr_index = $3->name;
   std::string value = $6->name;
@@ -331,13 +331,13 @@ expression: term operation expression {
   std::string last = $1->name;
   std::string first = $3->name;
   std::string temp = temp_var_incrementer();
-  
-  delete $1;
-  delete $3;
+
 
   $$ = new CodeNode();
   $$->name = temp;
-  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += $1->code;
+  $$->code += $3->code;
+  $$->code += std::string(". ") + temp + std::string("\n");
   $$->code += std::string($2->name) + std::string(" ") + temp + std::string(", ") + last + std::string(", ") + first + std::string("\n");
 }
 |term
@@ -379,11 +379,11 @@ term: sign NUMBER {
     |IDENTIFIER L_PAREN args R_PAREN
     ;
 
-arr_access: IDENTIFIER L_BRACK expression R_BRACK {
+arr_access: IDENTIFIER L_BRACK term R_BRACK {
   std::string variable = $1;
   std::string index = $3->name;
   std::string temp = temp_var_incrementer();
-  //delete $1;
+
   $$ = new CodeNode();
   $$->name = temp;
   $$->code = std::string(". ") + temp + std::string("\n");
