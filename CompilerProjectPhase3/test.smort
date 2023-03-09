@@ -1,13 +1,11 @@
-func int tst1(int x){
+func int tst1(int x, int y){
   x = 4;
  return x;
 }
-
 func int tst2(int y){
   y = 9;
  return 9;
 }
-
 main {
     int x;
     int y;
