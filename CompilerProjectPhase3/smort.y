@@ -101,8 +101,14 @@ void print_symbol_table(void){
 
 %%
 
-prog_start:functions main {
-  printf("%s\n", $2->code.c_str());
+prog_start: functions 
+{
+  std::string main_name = "main";
+  add_function_to_symbol_table(main_name);
+} 
+main {
+  printf("%s\n", $3->code.c_str());
+  printf("%s\n", "endfunc");
 }
 ;
 
@@ -120,7 +126,7 @@ functions: %empty{
           $$ = node;*/
 }
          ;
-
+//{add_function_to_symbol_table($3)}
 function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
         
           /*CodeNode *node = new CodeNode;
@@ -157,10 +163,7 @@ main:MAIN L_BRACE statements R_BRACE
     CodeNode* node = new CodeNode;
     node->code = $3->code;
     node->name = "";
-    //printf("%s\n", node->name.c_str());
     $$ = node;
-    //printf("%s", $3.code);
-   // printf("%s", $3.place);
   }
 ;
 
@@ -195,10 +198,10 @@ branch: %empty
 variable_declaration: prefix IDENTIFIER initialization
 {
   Type t = Integer;
-  //std::string value = $2;
-  //add_variable_to_symbol_table(value, t);
+  std::string var_name = $2;
+  add_variable_to_symbol_table(var_name, t);
   CodeNode* node = new CodeNode;
-  node->code = $3->code;
+  node->code += std::string("= ") +  var_name + std::string(", ") + $3->code;
   $$ = node;
   delete $2;
   delete $3;
