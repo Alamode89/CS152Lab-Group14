@@ -203,10 +203,11 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 }
 ;
 
-var_assignment: IDENTIFIER EQUAL term SEMICOLON{
+var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
   $$ = new CodeNode;
+  $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
   //$$ = node;
 }
@@ -224,8 +225,9 @@ expression: expression addop multerm
           |multerm {
             CodeNode* node = new CodeNode;
             node->code = $1->code;
+            node->name = $1->name;
             $$ = node;
-            delete $1;
+           // delete $1;
           }
           ;
 
