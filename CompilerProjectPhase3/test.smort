@@ -3,4 +3,5 @@ main {
     int y;
     int z;
     x = 5;
+    write(x);
 }

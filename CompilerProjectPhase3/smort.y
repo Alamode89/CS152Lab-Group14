@@ -93,6 +93,7 @@ void print_symbol_table(void){
 }
 
 %type <node> functions main statements term expression multerm initialization variable_declaration statement sign var_assignment
+%type <node> input_output read_write
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -166,7 +167,7 @@ main:MAIN L_BRACE statements R_BRACE
   }
 ;
 
-statements: { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
+statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
           |statement statements {
             CodeNode* node = new CodeNode;
             node->code = $1->code + $2->code;
@@ -178,8 +179,7 @@ statements: { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
 
 statement:variable_declaration
          |var_assignment
-         |read SEMICOLON 
-         |write SEMICOLON 
+         |input_output
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
@@ -214,11 +214,23 @@ var_assignment: IDENTIFIER EQUAL term SEMICOLON{
 initialization: NUMBER 
 ;
 
-read:READ L_PAREN IDENTIFIER R_PAREN 
-    ;
+input_output: read_write L_PAREN IDENTIFIER R_PAREN SEMICOLON {
+  std::string variable = $3;
+  $$ = new CodeNode();
+  std::string rw = $1->name;
+  $$->code = rw + std::string(" ") + variable + std::string("\n");
+}
 
-write:WRITE L_PAREN expression R_PAREN
-     ;
+read_write: READ
+|WRITE {
+  $$ = new CodeNode();
+  char e[] = ".>";
+  $$->name = e;
+}
+
+/*read:READ L_PAREN IDENTIFIER R_PAREN 
+    ;*/
+
 
 expression: expression addop multerm 
           |multerm {
