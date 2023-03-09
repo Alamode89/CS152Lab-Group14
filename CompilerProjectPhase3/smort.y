@@ -74,6 +74,13 @@ void print_symbol_table(void){
   printf("--------------------\n");
 }
 
+std::string temp_var_incrementer(){
+  std::stringstream new_temp_var;
+  new_temp_var << std::string("temp_") << count_names;
+  ++count_names;
+  return new_temp_var.str();
+}
+
 %}
 
 %union{
@@ -239,16 +246,17 @@ read_write: READ {
 
 
 expression: term operation expression {
-  std::string last = $3->name;
-  std::string first = $1->name;
+  std::string last = $1->name;
+  std::string first = $3->name;
 
   delete $1;
   delete $3;
 
   $$ = new CodeNode();
-  $$->name = std::string("tem"); //tems need helper func that incrementally creates new temp vars
-  $$->code = std::string(". ") + std::string("tem") + std::string("\n");
-  $$->code += std::string($2->name) + std::string(" ") + std::string("tem") + std::string(" ") + last + std::string(" ") + first + std::string("\n");
+  std::string temp = temp_var_incrementer();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(" ") + last + std::string(" ") + first + std::string("\n");
 }
 |term
 ;
