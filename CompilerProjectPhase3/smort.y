@@ -105,8 +105,7 @@ prog_start: functions
 {
   std::string main_name = "main";
   add_function_to_symbol_table(main_name);
-} 
-main {
+} main {
   printf("%s", $3->code.c_str());
   printf("%s\n", "endfunc");
 }
@@ -162,7 +161,7 @@ main:MAIN L_BRACE statements R_BRACE
     printf("%s\n", "func main");
     CodeNode* node = new CodeNode;
     node->code = $3->code;
-    node->name = "";
+    delete $3;
     $$ = node;
   }
 ;
@@ -176,7 +175,7 @@ statements:%empty
           ;
 
 statement:variable_declaration
-         |initialization SEMICOLON
+         |initialization
          |read SEMICOLON 
          |write SEMICOLON 
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
@@ -202,14 +201,15 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 }
 ;
 
-initialization: IDENTIFIER EQUAL expression {
-                  std::string var_name = $1;
-                  std::string value = $3->name;
+initialization: NUMBER {
+                  //std::string var_name = std::string("x");
+                  //std::string value = std::string("5");
               //add checker function to see if variable exists
-                  CodeNode* node = new CodeNode;
-                  node->code = $3->code;
-                  node->code += std::string("= ") +  var_name + std::string(", ") + value + std::string("\n");
-                  
+              printf("%s","haha");
+                  //CodeNode* node = new CodeNode();
+                  //node->code = std::string("haha");
+                  //node->code = std::string("haha\n");
+                  //$$ = node;
               }
 ;
 
@@ -233,12 +233,7 @@ addop: PLUS
      ;
 
 multerm: multerm mulop term 
-       |term {
-          CodeNode* node = new CodeNode;
-          node->code = $1->code;
-          $$ = node;
-          delete $1;
-       }
+       |term 
        ;
 
 mulop: MULT 
@@ -246,12 +241,13 @@ mulop: MULT
      ;
 
 term: sign NUMBER {
-      CodeNode* node = new CodeNode;
-      node->code = $2;
-      $$ = node;
-      delete $2;
+    $$ = new CodeNode();
+    $$->name = $2;
 }
-    |IDENTIFIER 
+|IDENTIFIER {
+    $$ = new CodeNode();
+    $$->name = $1;
+}
     |L_PAREN expression R_PAREN 
     |ARRAY L_BRACK NUMBER R_BRACK 
     |IDENTIFIER L_PAREN args R_PAREN
