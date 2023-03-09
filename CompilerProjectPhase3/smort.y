@@ -74,6 +74,13 @@ void print_symbol_table(void){
   printf("--------------------\n");
 }
 
+std::string temp_var_incrementer(){
+  std::stringstream new_temp_var;
+  new_temp_var << std::string("temp_") << count_names;
+  ++count_names;
+  return new_temp_var.str();
+}
+
 %}
 
 %union{
@@ -92,8 +99,9 @@ void print_symbol_table(void){
   } expression;
 }
 
-%type <node> functions function main statements term expression multerm initialization variable_declaration statement sign var_assignment
-%type <node> input_output read_write arguments argument
+%type <node> functions function main statements term expression initialization variable_declaration statement sign var_assignment
+%type <node> input_output read_write operation arguments argument args mlt_args
+
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -147,8 +155,8 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
 
          //add the return statement
          CodeNode *returns = new CodeNode;
-         CodeNode *expression = $10;
-         returns->code = std::string("ret ") + expression->code + std::string("\n");
+         std::string expression = $10->name;
+         returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
          node->code += returns->code;
 
          printf("%s",node->code.c_str());
@@ -194,7 +202,7 @@ main:MAIN L_BRACE statements R_BRACE
     node->name = "";
     printf("%s", node->code.c_str());
     printf("%s\n", "endfunc");
-    //$$ = node; UNDO COMMENT
+    //$$ = node;
     //printf("%s", $3.code);
     // printf("%s", $3.place);
     //node->code = $3->code;
@@ -275,28 +283,44 @@ read_write: READ {
     ;*/
 
 
-expression: expression addop multerm 
-          |multerm {
-            CodeNode* node = new CodeNode;
-            node->code = $1->code;
-            node->name = $1->name;
-            $$ = node;
-           // delete $1;
-          }
-          ;
+expression: term operation expression {
+  std::string last = $1->name;
+  std::string first = $3->name;
 
-addop: PLUS 
-     |MINUS 
-     ;
+  delete $1;
+  delete $3;
 
-multerm: multerm mulop term 
+  $$ = new CodeNode();
+  std::string temp = temp_var_incrementer();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(" ") + last + std::string(" ") + first + std::string("\n");
+}
+|term
+;
 
-       |term 
-       ;
+operation: PLUS {
+  $$ = new CodeNode();
+  char e[] = "+";
+  $$->name = e;
+}
+|MINUS {
+  $$ = new CodeNode();
+  char e[] = "-";
+  $$->name = e;
+}
+|MULT {
+  $$ = new CodeNode();
+  char e[] = "*";
+  $$->name = e;
+}
+|DIV {
+  $$ = new CodeNode();
+  char e[] = "/";
+  $$->name = e;
+}
+;
 
-mulop: MULT 
-     |DIV 
-     ;
 
 term: sign NUMBER {
     $$ = new CodeNode();
@@ -308,10 +332,19 @@ term: sign NUMBER {
 }
     |L_PAREN expression R_PAREN 
     |ARRAY L_BRACK NUMBER R_BRACK 
-    |IDENTIFIER L_PAREN args R_PAREN
+    |IDENTIFIER L_PAREN args R_PAREN{
+        //CodeNode *funct = new CodeNode;
+        //std::string id = $1;
+        //funct->code = std::string("call ") + id + std::string(", ") + 
+
+
+    }
     ;
 
-args:%empty 
+args:%empty{
+      CodeNode *node = new CodeNode;
+      $$ = node;
+}
     |mlt_args 
     ;
 
@@ -319,7 +352,10 @@ mlt_args:expression
         |expression COMMA mlt_args 
         ;
 
-sign: %empty 
+sign: %empty{
+      CodeNode *node = new CodeNode;
+      $$ = node;
+    }
     |MINUS 
     ;
 

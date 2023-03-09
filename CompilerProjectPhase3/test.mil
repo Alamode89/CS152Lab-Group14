@@ -1,10 +1,12 @@
 func tst1
 . x
 = x, 4
+ret x
 endfunc
 func tst2
 . y
 = y, 9
+ret 9
 endfunc
 func main
 . x
