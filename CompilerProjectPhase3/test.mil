@@ -11,9 +11,17 @@ endfunc
 func main
 . x
 . y
-. z
 = x, 5
-= y, 2
-.< y
-.> x
+= y, 5
+.[] z, 5
+. _temp0
++ _temp0, x, y
+[]= z, 0, _temp0
+. _temp1
+=[] _temp1, z, 0
+.> _temp1
+[]= z, 1, 100
+. _temp2
+=[] _temp2, z, 1
+.> _temp2
 endfunc

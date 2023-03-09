@@ -11,9 +11,12 @@ func int tst2(int y){
 main {
     int x;
     int y;
-    int z;
     x = 5;
-    y = 2;
-    read(y);
-    write(x);
+    y = 5;
+    int z = arr[5];
+    z[0] = x + y;
+    write(z[0]);
+
+    z[1] = 100;
+    write(z[1]);
 }

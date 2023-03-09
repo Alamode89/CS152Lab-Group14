@@ -76,7 +76,7 @@ void print_symbol_table(void){
 
 std::string temp_var_incrementer(){
   std::stringstream new_temp_var;
-  new_temp_var << std::string("temp_") << count_names;
+  new_temp_var << std::string("_temp") << count_names;
   ++count_names;
   return new_temp_var.str();
 }
@@ -99,8 +99,8 @@ std::string temp_var_incrementer(){
   } expression;
 }
 
-%type <node> functions function main statements term expression initialization variable_declaration statement sign var_assignment
-%type <node> input_output read_write operation arguments argument args mlt_args
+%type <node> functions function main statements term expression variable_declaration statement sign var_assignment
+%type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
 
 
 %start prog_start
@@ -227,8 +227,30 @@ statement:variable_declaration
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
-         |ARRAY L_BRACK array_terms R_BRACK initialization SEMICOLON
+         |array_declaration
+         |array_assignment
          ;
+
+array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
+  Type t = Integer;
+  std::string arr_name = $2;
+  add_variable_to_symbol_table(arr_name, t);
+  std::string arr_size = $6->name;
+  $$ = new CodeNode();
+  $$->code = std::string(".[] ") + arr_name + std::string(", ") + arr_size + std::string("\n");
+}
+;
+
+array_assignment: IDENTIFIER L_BRACK expression R_BRACK EQUAL expression SEMICOLON {
+  std::string arr_name = $1;
+  std::string arr_index = $3->name;
+  std::string value = $6->name;
+  //check if it exists need helper functions
+  $$ = new CodeNode();
+  $$->code = $6->code;
+  $$->code += std::string("[]= ") + arr_name + std::string(", ") + arr_index + std::string(", ") + value + std::string("\n");
+}
+;
 
 branch: %empty
       |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
@@ -257,14 +279,13 @@ var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   //$$ = node;
 }
 ;
-initialization: NUMBER 
-;
 
-input_output: read_write L_PAREN IDENTIFIER R_PAREN SEMICOLON {
-  std::string variable = $3;
+input_output: read_write L_PAREN expression R_PAREN SEMICOLON {
+  std::string variable = $3->name;
   $$ = new CodeNode();
   std::string rw = $1->name;
-  $$->code = rw + std::string(" ") + variable + std::string("\n");
+  $$->code = $3->code;
+  $$->code += rw + std::string(" ") + variable + std::string("\n");
 }
 
 read_write: READ {
@@ -279,22 +300,19 @@ read_write: READ {
   $$->name = e;
 }
 
-/*read:READ L_PAREN IDENTIFIER R_PAREN 
-    ;*/
-
 
 expression: term operation expression {
   std::string last = $1->name;
   std::string first = $3->name;
-
+  std::string temp = temp_var_incrementer();
+  
   delete $1;
   delete $3;
 
   $$ = new CodeNode();
-  std::string temp = temp_var_incrementer();
   $$->name = temp;
   $$->code = std::string(". ") + temp + std::string("\n");
-  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(" ") + last + std::string(" ") + first + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(", ") + last + std::string(", ") + first + std::string("\n");
 }
 |term
 ;
@@ -330,20 +348,26 @@ term: sign NUMBER {
     $$ = new CodeNode();
     $$->name = $1;
 }
+|arr_access
     |L_PAREN expression R_PAREN 
-    |ARRAY L_BRACK NUMBER R_BRACK 
-    |IDENTIFIER L_PAREN args R_PAREN{
-        //CodeNode *funct = new CodeNode;
-        //std::string id = $1;
-        //funct->code = std::string("call ") + id + std::string(", ") + 
-
-
-    }
+    |IDENTIFIER L_PAREN args R_PAREN
     ;
 
-args:%empty{
-      CodeNode *node = new CodeNode;
-      $$ = node;
+arr_access: IDENTIFIER L_BRACK expression R_BRACK {
+  std::string variable = $1;
+  std::string index = $3->name;
+  std::string temp = temp_var_incrementer();
+  //delete $1;
+  $$ = new CodeNode();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+ // printf("=[] %s, %s, %s\n", temp.c_str(), variable.c_str(), index.c_str());
+  $$->code += std::string("=[] ") + temp + std::string(", ") + variable + std::string(", ") + index + std::string("\n");
+}
+
+args:%empty {
+    CodeNode *node = new CodeNode;
+    $$ = node;
 }
     |mlt_args 
     ;
@@ -379,10 +403,6 @@ bool_operation: GREATER_THAN
               |EQUAL_TO 
               |NOT_EQUAL 
               ;
-
-array_terms: NUMBER 
-           | NUMBER COMMA array_terms
-           ;
 
 %%
 
