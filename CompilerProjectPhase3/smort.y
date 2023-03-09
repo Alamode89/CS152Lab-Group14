@@ -200,12 +200,18 @@ array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEM
 
 array_assignment: IDENTIFIER L_BRACK expression R_BRACK EQUAL expression SEMICOLON {
   std::string arr_name = $1;
-  //check if it exists
+  std::string arr_index = $3->name;
+  std::string value = $6->name;
+  //check if it exists need helper functions
   CodeNode* node = new CodeNode();
-
+  node->code = std::string("[]= ") + arr_name + std::string(", ") + arr_index + std::string(", ") + value + std::string("\n");
+  $$ = node;
 }
 ;
 
+int a = arr[5];
+a[1] = 1 + 4;
+a[1] = a[4] + 6
 branch: %empty
       |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
       |ELSE L_BRACE statements R_BRACE

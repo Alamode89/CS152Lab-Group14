@@ -2,4 +2,5 @@ main {
     int x;
     x = 5;
     int a = arr[5];
+    a[0] = 5;
 }
