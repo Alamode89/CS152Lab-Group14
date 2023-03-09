@@ -100,7 +100,7 @@ std::string temp_var_incrementer(){
 }
 
 %type <node> functions main statements term expression variable_declaration statement sign var_assignment
-%type <node> input_output read_write array_assignment array_declaration array_terms operation
+%type <node> input_output read_write array_assignment array_declaration operation arr_access
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -243,10 +243,11 @@ var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
 ;
 
 input_output: read_write L_PAREN expression R_PAREN SEMICOLON {
-  std::string variable = $3;
+  std::string variable = $3->name;
   $$ = new CodeNode();
   std::string rw = $1->name;
-  $$->code = rw + std::string(" ") + variable + std::string("\n");
+  $$->code = $3->code;
+  $$->code += rw + std::string(" ") + variable + std::string("\n");
 }
 
 read_write: READ {
@@ -273,7 +274,7 @@ expression: term operation expression {
   $$ = new CodeNode();
   $$->name = temp;
   $$->code = std::string(". ") + temp + std::string("\n");
-  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(" ") + last + std::string(" ") + first + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(", ") + last + std::string(", ") + first + std::string("\n");
 }
 |term
 ;
@@ -309,10 +310,22 @@ term: sign NUMBER {
     $$ = new CodeNode();
     $$->name = $1;
 }
+|arr_access
     |L_PAREN expression R_PAREN 
-    |ARRAY L_BRACK NUMBER R_BRACK 
     |IDENTIFIER L_PAREN args R_PAREN
     ;
+
+arr_access: IDENTIFIER L_BRACK expression R_BRACK {
+  std::string variable = $1;
+  std::string index = $3->name;
+  std::string temp = temp_var_incrementer();
+  //delete $1;
+  $$ = new CodeNode();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+ // printf("=[] %s, %s, %s\n", temp.c_str(), variable.c_str(), index.c_str());
+  $$->code += std::string("=[] ") + temp + std::string(", ") + variable + std::string(", ") + index + std::string("\n");
+}
 
 args:%empty 
     |mlt_args 
@@ -346,10 +359,6 @@ bool_operation: GREATER_THAN
               |EQUAL_TO 
               |NOT_EQUAL 
               ;
-
-array_terms: term
-           | NUMBER COMMA array_terms
-           ;
 
 %%
 
