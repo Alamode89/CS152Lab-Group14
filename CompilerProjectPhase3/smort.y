@@ -3,9 +3,10 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
+  #include <sstream>
   #include <vector>
   #include <string>
-
+  #include "y.tab.h"
   extern FILE* yyin;
   //Below code is from practice lab 3
   extern int yylex(void); //new line
@@ -17,7 +18,7 @@ char *identToken;
 int numberToken;
 int count_names = 0;
 
-/*
+
 enum Type {Integer, Array};
 struct Symbol{
   std::string name;
@@ -72,12 +73,14 @@ void print_symbol_table(void){
   }
   printf("--------------------\n");
 }
-*/
+
 %}
 
 %union{
   char *op_val;
   int int_val;
+
+  struct CodeNode *node;
 
   struct S{
     char *code;
@@ -89,19 +92,17 @@ void print_symbol_table(void){
   } expression;
 }
 
-%type <CodeNode> functions main statements term expression multerm initialization variable_declaration statement sign
+%type <node> functions main statements term expression multerm initialization variable_declaration statement sign
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
-%token <op_val>NUMBER
-%token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY 
-%token <op_val>IDENTIFIER /*had to make the identifier token an op_val this fixed an error I was having*/
-%token <op_val>MAIN
+%token <op_val>NUMBER IDENTIFIER
+%token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY MAIN
 
 %%
 
 prog_start:functions main {
-  //printf("%s", $2->name);
+  printf("%s\n", $2->code.c_str());
 }
 ;
 
@@ -149,15 +150,15 @@ arguments: argument
 argument:%empty
         |INTEGER IDENTIFIER
         ;
-
-main:IDENTIFIER L_BRACE statements R_BRACE 
+//leaves of the trees or anything to combine
+main:MAIN L_BRACE statements R_BRACE 
   {
-    //CodeNode* node = new CodeNode;
-    //node->code = "";
-    //node->name = $1;
-    printf("%s\n", "hi");
+    printf("%s\n", "func main");
+    CodeNode* node = new CodeNode;
+    node->code = $3->code;
+    node->name = "";
     //printf("%s\n", node->name.c_str());
-    //$$ = node;
+    $$ = node;
     //printf("%s", $3.code);
    // printf("%s", $3.place);
   }
@@ -165,14 +166,18 @@ main:IDENTIFIER L_BRACE statements R_BRACE
 
 statements:%empty
           |statement statements {
-              //$$.place = $1.place;
-              //$$.code = $1.code;
+            CodeNode* node = new CodeNode;
+            node->code = $1->code;
+            $$ = node;
+            delete $1;
           }
           ;
 
 statement:variable_declaration SEMICOLON {
-  //$$.place = $1.place;
-  //$$.code = $1.code;
+    CodeNode* node = new CodeNode;
+    node->code = $1->code;
+    $$ = node;
+   // delete $1;
 }
          |read SEMICOLON 
          |write SEMICOLON 
@@ -189,9 +194,14 @@ branch: %empty
 
 variable_declaration: prefix IDENTIFIER initialization
 {
-  //printf("%s", $2);
-  //$$.place = strdup("1");
-  //$$.code = strdup("2");
+  Type t = Integer;
+  //std::string value = $2;
+  //add_variable_to_symbol_table(value, t);
+  CodeNode* node = new CodeNode;
+  node->code = $3->code;
+  $$ = node;
+  delete $2;
+  delete $3;
 }
 ;
 
@@ -203,8 +213,10 @@ prefix: %empty{
 
 initialization:%empty
               |EQUAL expression {
-                //printf("%s", $2.code);
-                //$$.code = strdup($2.code);
+                  CodeNode* node = new CodeNode;
+                  node->code = $2->code;
+                  $$ = node;
+                  delete $2;
               }
               ;
 
@@ -216,8 +228,10 @@ write:WRITE L_PAREN expression R_PAREN
 
 expression: expression addop multerm 
           |multerm {
-            //printf("%s", $1.code);
-            //$$.code = strdup($1.code);
+            CodeNode* node = new CodeNode;
+            node->code = $1->code;
+            $$ = node;
+            delete $1;
           }
           ;
 
@@ -227,7 +241,10 @@ addop: PLUS
 
 multerm: multerm mulop term 
        |term {
-        //$$.code = strdup($1.code);
+          CodeNode* node = new CodeNode;
+          node->code = $1->code;
+          $$ = node;
+          delete $1;
        }
        ;
 
@@ -236,11 +253,10 @@ mulop: MULT
      ;
 
 term: sign NUMBER {
-  //printf("%d", $2);
-  //char str[20];
-  //snprintf(str, sizeof(str),"%d", $2);
-  //printf("%s", str);
-  //$$.code = strdup("hi");
+      CodeNode* node = new CodeNode;
+      node->code = $2;
+      $$ = node;
+      delete $2;
 }
     |IDENTIFIER 
     |L_PAREN expression R_PAREN 
