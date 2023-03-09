@@ -20,28 +20,36 @@ int count_names = 0;
 
 
 enum Type {Integer, Array};
-struct Symbol{
+struct Variable{
   std::string name;
   Type type;
 };
 struct Function {
   std::string name;
-  std::vector<Symbol> declarations;
+  std::vector<Variable> declarations;
 };
 
 std::vector <Function> symbol_table;
 
-
-Function *get_function(){
-  int last = symbol_table.size()-1;
-  return &symbol_table[last];
+bool foundInVec(std::vector<Variable> vec, std::string& value) {
+  for (int i = 0; i < vec.size(); i++) {
+    if (vec.at(i).name == value) {
+      return true;
+    }
+  }
+  return false;
 }
 
-bool find(std::string &value){
+Function *get_function(){
+  int final = symbol_table.size()-1;
+  return &symbol_table[final];
+}
+
+bool find(const std::string &value){
   Function *f = get_function();
   for(int i = 0; i < f->declarations.size(); i++) {
-    Symbol *s = &f->declarations[i];
-    if(s->name == value){
+    Variable *v = &f->declarations[i];
+    if(v->name == value){
       return true;
     }
   }
@@ -55,11 +63,11 @@ void add_function_to_symbol_table(std::string &value) {
 }
 
 void add_variable_to_symbol_table(std::string &value, Type t) {
-  Symbol s;
-  s.name = value;
-  s.type = t;
+  Variable v;
+  v.name = value;
+  v.type = t;
   Function *f = get_function();
-  f->declarations.push_back(s);
+  f->declarations.push_back(v);
 }
 
 void print_symbol_table(void){
@@ -74,11 +82,28 @@ void print_symbol_table(void){
   printf("--------------------\n");
 }
 
+void checkVarDuplicate(const std::string val) {
+  if (find(val)) {
+    std::string msg = "Error: duplicate declaration of variable '" + val + "'";
+    yyerror(msg.c_str());
+  }
+}
+
+void checkFuncDef(const std::string val){
+  for (int i = 0; i < symbol_table.size(); i++){
+    if (symbol_table.at(i).name == val){
+      return;
+    }
+  }
+  std::string msg = "Error: function '" + val + "' undefined";
+  yyerror(msg.c_str());
+}
+
 std::string temp_var_incrementer(){
-  std::stringstream new_temp_var;
-  new_temp_var << std::string("_temp") << count_names;
-  ++count_names;
-  return new_temp_var.str();
+   std::stringstream new_temp_var;
+   new_temp_var << std::string("_temp") << count_names;
+   ++count_names;
+   return new_temp_var.str();
 }
 
 %}
@@ -262,6 +287,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
   
   Type t = Integer;
   std::string var_name = $2;
+  checkVarDuplicate(var_name);
   add_variable_to_symbol_table(var_name, t);
   CodeNode* node = new CodeNode;
   node->code = std::string(". ") + var_name + std::string("\n");
