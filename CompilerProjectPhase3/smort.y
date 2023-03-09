@@ -93,7 +93,7 @@ void print_symbol_table(void){
 }
 
 %type <node> functions main statements term expression multerm initialization variable_declaration statement sign var_assignment
-%type <node> input_output read_write
+%type <node> input_output read_write array_assignment array_declaration array_terms
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -183,8 +183,28 @@ statement:variable_declaration
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
-         |ARRAY L_BRACK array_terms R_BRACK initialization SEMICOLON
+         |array_declaration
+         |array_assignment
          ;
+
+array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
+  Type t = Integer;
+  std::string arr_name = $2;
+  add_variable_to_symbol_table(arr_name, t);
+  std::string arr_size = $6->name;
+  CodeNode* node = new CodeNode();
+  node->code = std::string(".[] ") + arr_name + std::string(", ") + arr_size + std::string("\n");
+  $$ = node;
+}
+;
+
+array_assignment: IDENTIFIER L_BRACK expression R_BRACK EQUAL expression SEMICOLON {
+  std::string arr_name = $1;
+  //check if it exists
+  CodeNode* node = new CodeNode();
+
+}
+;
 
 branch: %empty
       |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
@@ -233,9 +253,6 @@ read_write: READ {
   char e[] = ".>";
   $$->name = e;
 }
-
-/*read:READ L_PAREN IDENTIFIER R_PAREN 
-    ;*/
 
 
 expression: expression addop multerm 
@@ -306,7 +323,7 @@ bool_operation: GREATER_THAN
               |NOT_EQUAL 
               ;
 
-array_terms: NUMBER 
+array_terms: term
            | NUMBER COMMA array_terms
            ;
 

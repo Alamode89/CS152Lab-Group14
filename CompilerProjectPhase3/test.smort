@@ -1,9 +1,5 @@
 main {
     int x;
-    int y;
-    int z;
     x = 5;
-    y = 2;
-    read(y);
-    write(x);
+    int a = arr[5];
 }
