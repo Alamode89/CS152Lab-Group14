@@ -263,6 +263,16 @@ operation: PLUS {
   char e[] = "-";
   $$->name = e;
 }
+|MULT {
+  $$ = new CodeNode();
+  char e[] = "*";
+  $$->name = e;
+}
+|DIV {
+  $$ = new CodeNode();
+  char e[] = "/";
+  $$->name = e;
+}
 ;
 
 
