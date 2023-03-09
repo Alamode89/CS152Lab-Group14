@@ -5,7 +5,7 @@
   #include <string.h>
   #include <vector>
   #include <string>
-
+  #include "y.tab.h"
   extern FILE* yyin;
   //Below code is from practice lab 3
   extern int yylex(void); //new line
@@ -73,8 +73,6 @@ void print_symbol_table(void){
 }
 
 
-void yyerror(const char *msg);
-
 %}
 
 %union{
@@ -84,32 +82,31 @@ void yyerror(const char *msg);
 }
 
 %start prog_start
-%token NUMBER PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
+%token /*NUMBER*/ PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
 %token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY 
-%token <op_val>IDENTIFIER /*had to make the identifier token an op_val this fixed an error I was having*/
+%token <op_val>IDENTIFIER NUMBER /*had to make the identifier token an op_val this fixed an error I was having*/
 %token MAIN
-
-/*%type <code_node> functions
+%type <code_node> functions
 %type <code_node> function
 %type <code_node> statements
 %type <code_node> statement
 %type <code_node> arguments
-%type <code_node> argument*/
+%type <code_node> argument
 %type <code_node> variable_declaration
 
 %%
 
 prog_start:functions main{
 
-          /*CodeNode *code_node = $1;
-          printf("%s\n", code_node->code.c_str());*/
+          CodeNode *code_node = $1;
+          printf("%s\n", code_node->code.c_str());
 }
           ;
 
 functions: %empty{
           
-         /* CodeNode *node = new CodeNode;
-          $$ = node;*/
+          CodeNode *node = new CodeNode;
+          $$ = node;
 }
          |function functions{
 
@@ -174,13 +171,8 @@ branch: %empty
 
 variable_declaration: prefix IDENTIFIER initialization{
                     
-                    CodeNode *code_node = new CodeNode;
-                    CodeNode *code_node2 = new CodeNode;
-                    code_node2 = $3;
-                    std::string id = $2;
-                    code_node->code = std::string(". ") + id + std::string("\n");
-                    code_node->code = std::string ("= ") + code_node2->code + std::string("\n");
-                    $$ = code_node;
+                    std::string value = $2;
+                    printf(". %s\n", value.c_str());
 }
                     ;
 

@@ -3,10 +3,14 @@
 %{
 #include <stdio.h>
 #include "y.tab.h"
-#define YY_DECL int yylex(void)
+#include <string.h>
+//#define YY_DECL int yylex(void)
 
 int row = 1;
 int col = 1;
+
+  extern char *identToken;
+  extern int numberToken;
 %}
 
 NUMBER [0-9]
@@ -51,7 +55,12 @@ func                {col+=4;return FUNCTION;}
 return              {col+= 6;return RETURN;}
 arr                 {col+=3;return ARRAY;}
 main                {col+=4;return MAIN;}
-{IDENTIFIER}        {col += yyleng;return IDENTIFIER;}
+{IDENTIFIER}        {col += yyleng;//return IDENTIFIER;This enire part was changed, revert if does not work
+                    char *token = new char[yyleng];
+                    strcpy(token, yytext);
+                    yylval.op_val = token;
+                    identToken = yytext;
+                    return IDENTIFIER;}
 TRUE                {col+=4;return TRUE;}
 FALSE               {col+=5;return FALSE;}
 " "                 {col++;}
