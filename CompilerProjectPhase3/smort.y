@@ -107,7 +107,7 @@ prog_start: functions
   add_function_to_symbol_table(main_name);
 } 
 main {
-  printf("%s\n", $3->code.c_str());
+  printf("%s", $3->code.c_str());
   printf("%s\n", "endfunc");
 }
 ;
@@ -172,12 +172,11 @@ statements:%empty
             CodeNode* node = new CodeNode;
             node->code = $1->code + $2->code;
             $$ = node;
-            delete $1;
-            delete $2;
           }
           ;
 
-statement:variable_declaration SEMICOLON 
+statement:variable_declaration
+         |initialization SEMICOLON
          |read SEMICOLON 
          |write SEMICOLON 
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
@@ -191,33 +190,28 @@ branch: %empty
       |ELSE L_BRACE statements R_BRACE
       ;
 
-variable_declaration: prefix IDENTIFIER initialization
+variable_declaration: INTEGER IDENTIFIER SEMICOLON
 {
   Type t = Integer;
   std::string var_name = $2;
   add_variable_to_symbol_table(var_name, t);
   CodeNode* node = new CodeNode;
-  node->code += std::string(". ") + var_name + std::string("\n");
-  node->code += std::string("= ") +  var_name + std::string(", ") + $3->code;
+  node->code = std::string(". ") + var_name + std::string("\n");
   $$ = node;
   delete $2;
 }
 ;
 
-prefix: %empty{
-
-      }
-      |INTEGER
-      ;
-
-initialization:%empty
-              |EQUAL expression {
+initialization: IDENTIFIER EQUAL expression {
+                  std::string var_name = $1;
+                  std::string value = $3->name;
+              //add checker function to see if variable exists
                   CodeNode* node = new CodeNode;
-                  node->code = $2->code;
-                  $$ = node;
-                  delete $2;
+                  node->code = $3->code;
+                  node->code += std::string("= ") +  var_name + std::string(", ") + value + std::string("\n");
+                  
               }
-              ;
+;
 
 read:READ L_PAREN IDENTIFIER R_PAREN 
     ;
