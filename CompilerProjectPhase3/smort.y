@@ -3,9 +3,10 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
+  #include <sstream>
   #include <vector>
   #include <string>
-
+  #include "y.tab.h"
   extern FILE* yyin;
   //Below code is from practice lab 3
   extern int yylex(void); //new line
@@ -17,7 +18,8 @@ char *identToken;
 int numberToken;
 int count_names = 0;
 
-enum Type {Intiger, Array};
+
+enum Type {Integer, Array};
 struct Symbol{
   std::string name;
   Type type;
@@ -75,33 +77,39 @@ void print_symbol_table(void){
 %}
 
 %union{
-  struct CodeNode *code_node;
   char *op_val;
   int int_val;
+
+  struct CodeNode *node;
+
+  struct S{
+    char *code;
+  } statement;
+
+  struct E{
+    char *place;
+    char *code;
+  } expression;
 }
 
-%start prog_start
-%token NUMBER PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
-%token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY 
-%token <op_val>IDENTIFIER /*had to make the identifier token an op_val this fixed an error I was having*/
-%token MAIN
+%type <node> functions main statements term expression multerm initialization variable_declaration statement sign var_assignment
 
-/*%type <code_node> functions
-%type <code_node> function
-%type <code_node> statements
-%type <code_node> statement
-%type <code_node> arguments
-%type <code_node> argument*/
-%type <code_node> variable_declaration
+%start prog_start
+%token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
+%token <op_val>NUMBER IDENTIFIER
+%token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY MAIN
 
 %%
 
-prog_start:functions main{
-
-          /*CodeNode *code_node = $1;
-          printf("%s\n", code_node->code.c_str());*/
+prog_start: functions 
+{
+  std::string main_name = "main";
+  add_function_to_symbol_table(main_name);
+} main {
+  printf("%s", $3->code.c_str());
+  printf("%s\n", "endfunc");
 }
-          ;
+;
 
 functions: %empty{
           
@@ -117,8 +125,8 @@ functions: %empty{
           $$ = node;*/
 }
          ;
-
-function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE{
+//{add_function_to_symbol_table($3)}
+function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
         
           /*CodeNode *node = new CodeNode;
           std::string func_name = $3;
@@ -147,15 +155,29 @@ arguments: argument
 argument:%empty
         |INTEGER IDENTIFIER
         ;
-
+//leaves of the trees or anything to combine
 main:MAIN L_BRACE statements R_BRACE 
-    ;
+  {
+    printf("%s\n", "func main");
+    CodeNode* node = new CodeNode;
+    node->code = $3->code;
+    delete $3;
+    $$ = node;
+  }
+;
 
-statements:%empty
-          |statement statements
+statements: { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
+          |statement statements {
+            CodeNode* node = new CodeNode;
+            node->code = $1->code + $2->code;
+            delete $1;
+            delete $2;
+            $$ = node;
+          }
           ;
 
-statement:variable_declaration SEMICOLON
+statement:variable_declaration
+         |var_assignment
          |read SEMICOLON 
          |write SEMICOLON 
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
@@ -169,27 +191,28 @@ branch: %empty
       |ELSE L_BRACE statements R_BRACE
       ;
 
-variable_declaration: prefix IDENTIFIER initialization{
-                    
-                    CodeNode *code_node = new CodeNode;
-                    CodeNode *code_node2 = new CodeNode;
-                    code_node2 = $3;
-                    std::string id = $2;
-                    code_node->code = std::string(". ") + id + std::string("\n");
-                    code_node->code = std::string ("= ") + code_node2->code + std::string("\n");
-                    $$ = code_node;
+variable_declaration: INTEGER IDENTIFIER SEMICOLON
+{
+  Type t = Integer;
+  std::string var_name = $2;
+  add_variable_to_symbol_table(var_name, t);
+  CodeNode* node = new CodeNode;
+  node->code = std::string(". ") + var_name + std::string("\n");
+  $$ = node;
+  delete $2;
 }
-                    ;
+;
 
-prefix: %empty{
-
-      }
-      |INTEGER
-      ;
-
-initialization:%empty
-              |EQUAL expression 
-              ;
+var_assignment: IDENTIFIER EQUAL term SEMICOLON{
+  std::string variable = $1;
+  std::string value = $3->name;
+  $$ = new CodeNode;
+  $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
+  //$$ = node;
+}
+;
+initialization: NUMBER 
+;
 
 read:READ L_PAREN IDENTIFIER R_PAREN 
     ;
@@ -198,7 +221,12 @@ write:WRITE L_PAREN expression R_PAREN
      ;
 
 expression: expression addop multerm 
-          |multerm 
+          |multerm {
+            CodeNode* node = new CodeNode;
+            node->code = $1->code;
+            $$ = node;
+            delete $1;
+          }
           ;
 
 addop: PLUS 
@@ -213,8 +241,14 @@ mulop: MULT
      |DIV 
      ;
 
-term: sign NUMBER
-    |IDENTIFIER 
+term: sign NUMBER {
+    $$ = new CodeNode();
+    $$->name = $2;
+}
+|IDENTIFIER {
+    $$ = new CodeNode();
+    $$->name = $1;
+}
     |L_PAREN expression R_PAREN 
     |ARRAY L_BRACK NUMBER R_BRACK 
     |IDENTIFIER L_PAREN args R_PAREN

@@ -2,11 +2,14 @@
 
 %{
 #include <stdio.h>
+#include <string.h>
 #include "y.tab.h"
 #define YY_DECL int yylex(void)
 
 int row = 1;
 int col = 1;
+extern char *identToken;
+extern int numberToken;
 %}
 
 NUMBER [0-9]
@@ -15,7 +18,6 @@ LINE_COMMENT "\/\/".*"\n"
 
 %%
 
-{NUMBER}+           {col += yyleng;return NUMBER;}
 "+"                 {col++;return PLUS;}
 "-"                 {col++;return MINUS;}
 "*"                 {col++;return MULT;}
@@ -51,7 +53,22 @@ func                {col+=4;return FUNCTION;}
 return              {col+= 6;return RETURN;}
 arr                 {col+=3;return ARRAY;}
 main                {col+=4;return MAIN;}
-{IDENTIFIER}        {col += yyleng;return IDENTIFIER;}
+{NUMBER}+           {
+    col += yyleng;
+    char * token = new char[yyleng];
+    strcpy(token, yytext);
+    yylval.op_val = token;
+    numberToken = atoi(yytext);
+    return NUMBER;
+}
+{IDENTIFIER}     {
+    col += yyleng;
+    char * token = new char[yyleng];
+    strcpy(token, yytext);
+    yylval.op_val = token;
+    identToken = yytext;
+    return IDENTIFIER;
+}
 TRUE                {col+=4;return TRUE;}
 FALSE               {col+=5;return FALSE;}
 " "                 {col++;}
