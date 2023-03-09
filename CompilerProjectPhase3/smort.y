@@ -7,7 +7,6 @@
   #include <vector>
   #include <string>
   #include "y.tab.h"
-  #include <cstdlib>
   extern FILE* yyin;
   //Below code is from practice lab 3
   extern int yylex(void); //new line
@@ -100,6 +99,13 @@ void checkFuncDef(const std::string val){
   yyerror(msg.c_str());
 }
 
+std::string temp_var_incrementer(){
+   std::stringstream new_temp_var;
+   new_temp_var << std::string("_temp") << count_names;
+   ++count_names;
+   return new_temp_var.str();
+}
+
 %}
 
 %union{
@@ -118,49 +124,52 @@ void checkFuncDef(const std::string val){
   } expression;
 }
 
-%type <node> functions main statements term expression variable_declaration statement sign var_assignment
-%type <node> input_output read_write array_assignment array_declaration operation arr_access
+%type <node> functions function main statements term expression variable_declaration statement sign var_assignment
+%type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
+
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
-%token <op_val>NUMBER IDENTIFIER
+%token <op_val> NUMBER IDENTIFIER
 %token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY MAIN
 
 %%
+
 
 prog_start: functions 
 {
   std::string main_name = "main";
   add_function_to_symbol_table(main_name);
 } main {
-  printf("%s", $3->code.c_str());
-  printf("%s\n", "endfunc");
+  //printf("%s", $3->code.c_str()); made these comments because they were outputting func main endfunc twice
+  //printf("%s\n", "endfunc");      the other print statement is in the main production
+
 }
 ;
 
 functions: %empty{
           
-         /* CodeNode *node = new CodeNode;
-          $$ = node;*/
+          CodeNode *node = new CodeNode;
+          $$ = node;
 }
          |function functions{
 
-         /* CodeNode *code_node1 = $1;
-          CodeNode *code_node2 = $2;
+          CodeNode *node1 = $1;
+          CodeNode *node2 = $2;
           CodeNode *node = new CodeNode;
-          node->code = code_node1->code + code_node2->code;
-          $$ = node;*/
+          node->code = node1->code + node2->code;
+          $$ = node;
 }
          ;
 //{add_function_to_symbol_table($3)}
 function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
         
-          /*CodeNode *node = new CodeNode;
-          std::string func_name = $3;
-          node->code = "";
+         CodeNode *node = new CodeNode;
+         std::string func_name = $3;
+         node->code = "";
           //add the "func func_name
-          node->code +=  std::string("func ") + func_name + std::string("\n");
-          
+         node->code +=  std::string("func ") + func_name + std::string("\n");
+         //printf("%s\n", node->code.c_str());
           //add the argument code
           CodeNode *arguments = $5;
           node->code += arguments->code;
@@ -169,26 +178,60 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
           CodeNode *statements = $8;
           node->code += statements->code;
 
+         //add the return statement
+         CodeNode *returns = new CodeNode;
+         std::string expression = $10->name;
+         returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
+         node->code += returns->code;
 
-    
-          $$ = node;*/
+         printf("%s",node->code.c_str());
+         printf("%s\n", "endfunc");
+         $$ = node;
 }
           ;
 
-arguments: argument
-         |argument COMMA arguments 
+arguments: argument{
+          
+          CodeNode *node = $1;
+          $$ = node;
+}
+         |argument COMMA arguments {
+          CodeNode *node = $1;
+          CodeNode *node2 = $3;
+          node->code += node2->code;
+          $$ = node;
+}
          ;
 
-argument:%empty
-        |INTEGER IDENTIFIER
+argument:%empty{
+
+         CodeNode *node = new CodeNode;
+         $$ = node;
+        }
+        |INTEGER IDENTIFIER{
+         CodeNode *node = new CodeNode;
+         node->code = "";
+         std::string id = $2;
+         node->code += std::string(". ") + id + std::string("\n");
+         $$ = node;
+        }
         ;
-//leaves of the trees or anything to combine
+
 main:MAIN L_BRACE statements R_BRACE 
   {
-    printf("%s\n", "func main");
+    //printf("%s\n", "func main");
     CodeNode* node = new CodeNode;
-    node->code = $3->code;
-    delete $3;
+    node->code = "";
+    node->code += std::string("func main\n");
+    node->code += $3->code;
+    node->name = "";
+    printf("%s", node->code.c_str());
+    printf("%s\n", "endfunc");
+    //$$ = node;
+    //printf("%s", $3.code);
+    // printf("%s", $3.place);
+    //node->code = $3->code;
+    //delete $3;
     $$ = node;
   }
 ;
@@ -241,6 +284,7 @@ branch: %empty
 
 variable_declaration: INTEGER IDENTIFIER SEMICOLON
 {
+  
   Type t = Integer;
   std::string var_name = $2;
   checkVarDuplicate(var_name);
@@ -347,7 +391,10 @@ arr_access: IDENTIFIER L_BRACK expression R_BRACK {
   $$->code += std::string("=[] ") + temp + std::string(", ") + variable + std::string(", ") + index + std::string("\n");
 }
 
-args:%empty 
+args:%empty {
+    CodeNode *node = new CodeNode;
+    $$ = node;
+}
     |mlt_args 
     ;
 
@@ -355,7 +402,10 @@ mlt_args:expression
         |expression COMMA mlt_args 
         ;
 
-sign: %empty 
+sign: %empty{
+      CodeNode *node = new CodeNode;
+      $$ = node;
+    }
     |MINUS 
     ;
 
