@@ -144,9 +144,8 @@ prog_start: functions
   node->code = $1->code;
   printf("%s", node->code.c_str());
 } main {
-  
   CodeNode *node = new CodeNode();
-  node->code = $1->code;
+  node->code = $3->code;
   printf("%s", node->code.c_str());
 }
 
@@ -189,7 +188,7 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
          returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
          node->code += returns->code;
 
-         node->code += std::string("endfunc\n");
+         node->code += std::string("endfunc\n") + std::string("\n");
          $$ = node;
 }
           ;
@@ -228,7 +227,7 @@ main:MAIN L_BRACE statements R_BRACE
     node->code = "";
     node->code += std::string("func main\n");
     node->code += $3->code;
-    node->name = "";
+    //node->name = "";
     node->code += std::string("endfunc\n");
     //printf("%s\n", "endfunc");
     //$$ = node;
@@ -379,16 +378,15 @@ term: sign NUMBER {
     $$->name = $1;
 }
 |arr_access
-    |L_PAREN expression R_PAREN 
-    |IDENTIFIER L_PAREN args R_PAREN {//*********Function Call
+|L_PAREN expression R_PAREN 
+|IDENTIFIER L_PAREN args R_PAREN {//*********Function Call
     CodeNode *node = new CodeNode;
-    CodeNode *node2 = $3;
     std::string name = $1;
     std::string temp = temp_var_incrementer();//temporary variable for the function call destination
-    node->code = "";
-    node->code += node2->code;//add paramaters to beginning of node 
+    node->code += $3->code;//add paramaters to beginning of node 
     node->code += std::string(". ") + temp + std::string("\n");//next add the temporary variable declaration to the node
     node->code += std::string("call ") + name + std::string(", ") + temp + std::string("\n");//actual function call 
+    node->name = temp;
     $$ = node;
     }
     ;
@@ -420,7 +418,7 @@ mlt_args:expression {
         std::string param = $1->name; 
         node->code = "";
         node->code += std::string("param ") + param + std::string("\n");
-        printf("%s\n", node->code.c_str());
+        //printf("%s\n", node->code.c_str());
         $$ = node; //new line added*/
         }
         |expression COMMA mlt_args {
