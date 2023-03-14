@@ -282,10 +282,13 @@ statement:variable_declaration
           node->code += $3->code;
           node->code += std::string("?:= ") + temp_if + std::string(", ") + std::string($3->name) + std::string("\n");
           if (ifelse) {
+            ifelse = false;
             std::string temp_else = temp_else_incrementer();
             node->code += std::string(":= ") + temp_else + std::string("\n");
             node->code += std::string(": ") + temp_if + std::string("\n");
             node->code += $6->code;
+            node->code += std::string(":= ") + temp_endif + std::string("\n");
+            node->code += std::string(": ") + temp_else + std::string("\n");
           }
           else {
             node->code += std::string(": ") + temp_if + std::string("\n");
@@ -324,8 +327,11 @@ array_assignment: IDENTIFIER L_BRACK expression R_BRACK EQUAL expression SEMICOL
 ;
 
 branch: %empty
-      |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
-      |ELSE L_BRACE statements R_BRACE
+|ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch //only ifelse needed for lab implementation rn
+|ELSE L_BRACE statements R_BRACE {
+  ifelse = true;
+  
+}
       ;
 
 variable_declaration: INTEGER IDENTIFIER SEMICOLON
@@ -462,7 +468,6 @@ conditions: bool_statement
 
 bool_statement: term bool_operation term {
   std::string temp = temp_var_incrementer();
-  //std::string bool_op = $2->name;
   std::string first = $1->name;
   std::string last = $3->name;
 
