@@ -124,7 +124,7 @@ std::string temp_var_incrementer(){
   } expression;
 }
 
-%type <node> functions function main statements term expression variable_declaration statement sign var_assignment
+%type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions condition
 %type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
 
 
@@ -250,7 +250,16 @@ statement:variable_declaration
          |var_assignment
          |input_output
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
-         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
+         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE  {
+          //bring conditions up
+          CodeNode* node = new CodeNode();
+          node->code += std::string("hello");//$3->code;
+          node->code += $6->code;
+          //node->code += $8->code;
+
+          $$ = node;
+
+         }
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
          |array_declaration
          |array_assignment
