@@ -462,25 +462,49 @@ conditions: bool_statement
 
 bool_statement: term bool_operation term {
   std::string temp = temp_var_incrementer();
- // std::string bool_op = $2->name;
+  //std::string bool_op = $2->name;
   std::string first = $1->name;
   std::string last = $3->name;
 
   $$ = new CodeNode();
   $$->name = temp;
   $$->code = std::string(". ") + temp + std::string("\n");
-  $$->code += std::string("<") + std::string(" ") + temp + std::string(", ") + first + std::string(", ") + last + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(", ") + first + std::string(", ") + last + std::string("\n");
 }
               |TRUE 
               |FALSE 
               ;
 
-bool_operation: GREATER_THAN 
-              |LESS_THAN 
-              |GTE 
-              |LTE 
-              |EQUAL_TO 
-              |NOT_EQUAL 
+bool_operation: GREATER_THAN {
+  $$ = new CodeNode();
+  char b[] = ">";
+  $$->name = b;
+}
+|LESS_THAN {
+  $$ = new CodeNode();
+  char b[] = "<";
+  $$->name = b;
+}
+|GTE {
+  $$ = new CodeNode();
+  char b[] = ">=";
+  $$->name = b;
+}
+|LTE {
+  $$ = new CodeNode();
+  char b[] = "<=";
+  $$->name = b;
+}
+|EQUAL_TO {
+  $$ = new CodeNode();
+  char b[] = "==";
+  $$->name = b;
+}
+|NOT_EQUAL {
+  $$ = new CodeNode();
+  char b[] = "!=";
+  $$->name = b;
+}
               ;
 
 %%
