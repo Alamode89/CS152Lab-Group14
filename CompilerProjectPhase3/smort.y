@@ -6,6 +6,7 @@
   #include <sstream>
   #include <vector>
   #include <string>
+  #include <stdbool.h>
   #include "y.tab.h"
   extern FILE* yyin;
   //Below code is from practice lab 3
@@ -17,7 +18,10 @@
 char *identToken;
 int numberToken;
 int count_names = 0;
-
+int count_ifs = 0;
+int count_endif = 0;
+int count_else = 0;
+bool ifelse = false;
 
 enum Type {Integer, Array};
 struct Variable{
@@ -106,6 +110,26 @@ std::string temp_var_incrementer(){
    return new_temp_var.str();
 }
 
+std::string temp_if_incrementer(){
+   std::stringstream new_temp_if;
+   new_temp_if << std::string("if_true") << count_ifs;
+   ++count_ifs;
+   return new_temp_if.str();
+}
+
+std::string temp_endif_incrementer() {
+  std::stringstream new_temp_endif;
+  new_temp_endif << std::string("endif") << count_endif;
+  ++count_endif;
+  return new_temp_endif.str();
+}
+
+std::string temp_else_incrementer(){
+   std::stringstream new_temp_else;
+   new_temp_else << std::string("else") << count_else;
+   ++count_else;
+   return new_temp_else.str();
+}
 %}
 
 %union{
@@ -124,9 +148,9 @@ std::string temp_var_incrementer(){
   } expression;
 }
 
-%type <node> functions function main statements term expression variable_declaration statement sign var_assignment
+%type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions
 %type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
-
+%type <node> bool_statement bool_operation branch
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -253,7 +277,33 @@ statement:variable_declaration
          |var_assignment
          |input_output
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
-         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
+         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch{
+          //need to create if checks in here lol
+          std::string temp_if = temp_if_incrementer();
+          std::string temp_endif = temp_endif_incrementer();
+          CodeNode* node = new CodeNode();
+          node->code += $3->code;
+          node->code += std::string("?:= ") + temp_if + std::string(", ") + std::string($3->name) + std::string("\n");
+          if (ifelse) {
+            ifelse = false;
+            std::string temp_else = temp_else_incrementer();
+            node->code += std::string(":= ") + temp_else + std::string("\n");
+            node->code += std::string(": ") + temp_if + std::string("\n");
+            node->code += $6->code;
+            node->code += std::string(":= ") + temp_endif + std::string("\n");
+            node->code += std::string(": ") + temp_else + std::string("\n");
+            node->code += $8->code;
+          }
+          else {
+            node->code += std::string(": ") + temp_if + std::string("\n");
+            node->code += $6->code;
+            node->code += std::string(":= ") + temp_endif + std::string("\n");
+          }
+
+          node->code += std::string(": ") + temp_endif + std::string("\n");
+          $$ = node;
+
+         }
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
          |array_declaration
          |array_assignment
@@ -281,8 +331,13 @@ array_assignment: IDENTIFIER L_BRACK term R_BRACK EQUAL expression SEMICOLON {
 ;
 
 branch: %empty
-      |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch 
-      |ELSE L_BRACE statements R_BRACE
+|ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch //only ifelse needed for lab implementation rn
+|ELSE L_BRACE statements R_BRACE {
+  ifelse = true;
+  CodeNode* node = new CodeNode();
+  node->code += $3->code;
+  $$ = node; 
+}
       ;
 
 variable_declaration: INTEGER IDENTIFIER SEMICOLON
@@ -302,7 +357,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
-  $$ = new CodeNode;
+  $$ = new CodeNode();
   $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
   //$$ = node;
@@ -440,25 +495,56 @@ sign: %empty{
     |MINUS 
     ;
 
-conditions: condition 
-          |condition AND conditions 
-          |condition OR conditions 
+conditions: bool_statement 
+|TRUE
+|FALSE
+
+         // |condition AND conditions 
+          //|condition OR conditions 
           ;
 
-condition: bool_statement 
-         ;
+bool_statement: term bool_operation term {
+  std::string temp = temp_var_incrementer();
+  std::string first = $1->name;
+  std::string last = $3->name;
 
-bool_statement: term bool_operation term 
-              |TRUE 
-              |FALSE 
-              ;
+  $$ = new CodeNode();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += std::string($2->name) + std::string(" ") + temp + std::string(", ") + first + std::string(", ") + last + std::string("\n");
+}
+;
 
-bool_operation: GREATER_THAN 
-              |LESS_THAN 
-              |GTE 
-              |LTE 
-              |EQUAL_TO 
-              |NOT_EQUAL 
+bool_operation: GREATER_THAN {
+  $$ = new CodeNode();
+  char b[] = ">";
+  $$->name = b;
+}
+|LESS_THAN {
+  $$ = new CodeNode();
+  char b[] = "<";
+  $$->name = b;
+}
+|GTE {
+  $$ = new CodeNode();
+  char b[] = ">=";
+  $$->name = b;
+}
+|LTE {
+  $$ = new CodeNode();
+  char b[] = "<=";
+  $$->name = b;
+}
+|EQUAL_TO {
+  $$ = new CodeNode();
+  char b[] = "==";
+  $$->name = b;
+}
+|NOT_EQUAL {
+  $$ = new CodeNode();
+  char b[] = "!=";
+  $$->name = b;
+}
               ;
 
 %%
