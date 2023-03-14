@@ -275,8 +275,13 @@ statement:variable_declaration
           if (ifelse) {
             std::string temp_else = temp_else_incrementer();
             node->code += std::string(":= ") + temp_else + std::string("\n");
+            node->code += std::string(": ") + temp_if + std::string("\n");
+            node->code += $6->code;
           }
-          node->code += $6->code;
+          else {
+            node->code += std::string(": ") + temp_if + std::string("\n");
+            node->code += $6->code;
+          }
 
           $$ = node;
 
