@@ -164,11 +164,15 @@ prog_start: functions
 {
   std::string main_name = "main";
   add_function_to_symbol_table(main_name);
+  CodeNode *node = new CodeNode;
+  node->code = $1->code;
+  printf("%s", node->code.c_str());
 } main {
-  //printf("%s", $3->code.c_str()); made these comments because they were outputting func main endfunc twice
-  //printf("%s\n", "endfunc");      the other print statement is in the main production
-
+  CodeNode *node = new CodeNode();
+  node->code = $3->code;
+  printf("%s", node->code.c_str());
 }
+
 ;
 
 functions: %empty{
@@ -208,8 +212,7 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
          returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
          node->code += returns->code;
 
-         printf("%s",node->code.c_str());
-         printf("%s\n", "endfunc");
+         node->code += std::string("endfunc\n") + std::string("\n");
          $$ = node;
 }
           ;
@@ -248,9 +251,9 @@ main:MAIN L_BRACE statements R_BRACE
     node->code = "";
     node->code += std::string("func main\n");
     node->code += $3->code;
-    node->name = "";
-    printf("%s", node->code.c_str());
-    printf("%s\n", "endfunc");
+    //node->name = "";
+    node->code += std::string("endfunc\n");
+    //printf("%s\n", "endfunc");
     //$$ = node;
     //printf("%s", $3.code);
     // printf("%s", $3.place);
@@ -316,7 +319,7 @@ array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEM
 }
 ;
 
-array_assignment: IDENTIFIER L_BRACK expression R_BRACK EQUAL expression SEMICOLON {
+array_assignment: IDENTIFIER L_BRACK term R_BRACK EQUAL expression SEMICOLON {
   std::string arr_name = $1;
   std::string arr_index = $3->name;
   std::string value = $6->name;
@@ -386,13 +389,13 @@ expression: term operation expression {
   std::string last = $1->name;
   std::string first = $3->name;
   std::string temp = temp_var_incrementer();
-  
-  delete $1;
-  delete $3;
+
 
   $$ = new CodeNode();
   $$->name = temp;
-  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += $1->code;
+  $$->code += $3->code;
+  $$->code += std::string(". ") + temp + std::string("\n");
   $$->code += std::string($2->name) + std::string(" ") + temp + std::string(", ") + last + std::string(", ") + first + std::string("\n");
 }
 |term
@@ -430,15 +433,24 @@ term: sign NUMBER {
     $$->name = $1;
 }
 |arr_access
-    |L_PAREN expression R_PAREN 
-    |IDENTIFIER L_PAREN args R_PAREN
+|L_PAREN expression R_PAREN 
+|IDENTIFIER L_PAREN args R_PAREN {//*********Function Call
+    CodeNode *node = new CodeNode;
+    std::string name = $1;
+    std::string temp = temp_var_incrementer();//temporary variable for the function call destination
+    node->code += $3->code;//add paramaters to beginning of node 
+    node->code += std::string(". ") + temp + std::string("\n");//next add the temporary variable declaration to the node
+    node->code += std::string("call ") + name + std::string(", ") + temp + std::string("\n");//actual function call 
+    node->name = temp;
+    $$ = node;
+    }
     ;
 
-arr_access: IDENTIFIER L_BRACK expression R_BRACK {
+arr_access: IDENTIFIER L_BRACK term R_BRACK {
   std::string variable = $1;
   std::string index = $3->name;
   std::string temp = temp_var_incrementer();
-  //delete $1;
+
   $$ = new CodeNode();
   $$->name = temp;
   $$->code = std::string(". ") + temp + std::string("\n");
@@ -450,11 +462,30 @@ args:%empty {
     CodeNode *node = new CodeNode;
     $$ = node;
 }
-    |mlt_args 
+    |mlt_args {
+    CodeNode *node = $1; //new line added
+    $$ = node; //new line added
+    }
     ;
 
-mlt_args:expression 
-        |expression COMMA mlt_args 
+mlt_args:expression {
+        CodeNode *node = new CodeNode; //new line added
+        std::string param = $1->name; 
+        node->code = "";
+        node->code += std::string("param ") + param + std::string("\n");
+        //printf("%s\n", node->code.c_str());
+        $$ = node; //new line added*/
+        }
+        |expression COMMA mlt_args {
+        CodeNode *node1 = new CodeNode;
+        std::string param = $1->name;
+        node1->code = "";
+        node1->code += std::string("param ") + param + std::string("\n");
+        CodeNode *node2 = $3;
+        CodeNode *node = new CodeNode;
+        node->code = node1->code + node2->code;
+        $$ = node;
+        }
         ;
 
 sign: %empty{
@@ -529,5 +560,4 @@ int main (int argc, char** argv) {
 
 void yyerror(const char *msg) {
   printf("**  Line %d: %s\n", row, msg);
-  exit(1);
 }
