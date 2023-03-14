@@ -19,6 +19,7 @@ char *identToken;
 int numberToken;
 int count_names = 0;
 int count_ifs = 0;
+int count_endif = 0;
 int count_else = 0;
 bool ifelse = false;
 
@@ -114,6 +115,12 @@ std::string temp_if_incrementer(){
    new_temp_if << std::string("if_true") << count_ifs;
    ++count_ifs;
    return new_temp_if.str();
+}
+
+std::string temp_endif_incrementer() {
+  std::stringstream new_temp_endif;
+  new_temp_endif << std::string("endif") << count_endif;
+  ++count_endif;
 }
 
 std::string temp_else_incrementer(){
