@@ -465,6 +465,9 @@ sign: %empty{
     ;
 
 conditions: bool_statement 
+|TRUE
+|FALSE
+
          // |condition AND conditions 
           //|condition OR conditions 
           ;
@@ -479,9 +482,7 @@ bool_statement: term bool_operation term {
   $$->code = std::string(". ") + temp + std::string("\n");
   $$->code += std::string($2->name) + std::string(" ") + temp + std::string(", ") + first + std::string(", ") + last + std::string("\n");
 }
-              |TRUE 
-              |FALSE 
-              ;
+;
 
 bool_operation: GREATER_THAN {
   $$ = new CodeNode();

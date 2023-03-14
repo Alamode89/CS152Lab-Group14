@@ -7,9 +7,6 @@ main {
   if (a > b) {
     c = b;
   }
-  else {
-    c = a;
-  }
 
   write(c);
 }
