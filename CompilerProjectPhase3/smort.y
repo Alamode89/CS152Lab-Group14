@@ -18,6 +18,7 @@ char *identToken;
 int numberToken;
 int count_names = 0;
 int count_ifs = 0;
+int count_else = 0;
 
 enum Type {Integer, Array};
 struct Variable{
@@ -111,6 +112,13 @@ std::string temp_if_incrementer(){
    new_temp_if << std::string("if_true") << count_ifs;
    ++count_ifs;
    return new_temp_if.str();
+}
+
+std::string temp_else_incrementer(){
+   std::stringstream new_temp_else;
+   new_temp_else << std::string("else") << count_else;
+   ++count_else;
+   return new_temp_else.str();
 }
 %}
 
