@@ -255,6 +255,7 @@ statement:variable_declaration
           //need to create an if counter
           CodeNode* node = new CodeNode();
           node->code += $3->code;
+          node->code += std::string("?:= if_true0,") + std::string($3->name) + std::string("\n");
           node->code += $6->code;
 
           $$ = node;
