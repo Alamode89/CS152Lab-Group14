@@ -3,6 +3,6 @@ main {
   int y;
   int z;
   if (x < y) {
-    x = 5;
+    x = 5 + 1;
   }
 }

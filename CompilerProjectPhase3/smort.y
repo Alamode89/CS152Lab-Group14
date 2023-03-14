@@ -124,9 +124,9 @@ std::string temp_var_incrementer(){
   } expression;
 }
 
-%type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions condition
+%type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions
 %type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
-
+%type <node> bool_statement bool_operation
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -252,10 +252,10 @@ statement:variable_declaration
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE  {
           //bring conditions up
+          //need to create an if counter
           CodeNode* node = new CodeNode();
-          node->code += std::string("hello");//$3->code;
+          node->code += $3->code;
           node->code += $6->code;
-          //node->code += $8->code;
 
           $$ = node;
 
@@ -418,15 +418,22 @@ sign: %empty{
     |MINUS 
     ;
 
-conditions: condition 
-          |condition AND conditions 
-          |condition OR conditions 
+conditions: bool_statement 
+         // |condition AND conditions 
+          //|condition OR conditions 
           ;
 
-condition: bool_statement 
-         ;
+bool_statement: term bool_operation term {
+  std::string temp = temp_var_incrementer();
+ // std::string bool_op = $2->name;
+  std::string first = $1->name;
+  std::string last = $3->name;
 
-bool_statement: term bool_operation term 
+  $$ = new CodeNode();
+  $$->name = temp;
+  $$->code = std::string(". ") + temp + std::string("\n");
+  $$->code += std::string("<") + std::string(" ") + temp + std::string(", ") + first + std::string(", ") + last + std::string("\n");
+}
               |TRUE 
               |FALSE 
               ;
