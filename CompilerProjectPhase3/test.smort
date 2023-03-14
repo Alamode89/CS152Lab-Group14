@@ -1,17 +1,15 @@
 main {
-  int x;
-  int y;
-  int z;
-  if (x == y) {
-    x = y;
-  }
-  //else {
-    //x = 1;
-  //}
-  if (x == y) {
-    x = y;
+  int a;
+  int b;
+  int c;
+  a = 100;
+  b = 50;
+  if (a > b) {
+    c = b;
   }
   else {
-    x = 1;
+    c = a;
   }
+
+  write(c);
 }

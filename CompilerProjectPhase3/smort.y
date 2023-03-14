@@ -150,7 +150,7 @@ std::string temp_else_incrementer(){
 
 %type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions
 %type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
-%type <node> bool_statement bool_operation
+%type <node> bool_statement bool_operation branch
 
 %start prog_start
 %token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -289,6 +289,7 @@ statement:variable_declaration
             node->code += $6->code;
             node->code += std::string(":= ") + temp_endif + std::string("\n");
             node->code += std::string(": ") + temp_else + std::string("\n");
+            node->code += $8->code;
           }
           else {
             node->code += std::string(": ") + temp_if + std::string("\n");
@@ -330,7 +331,9 @@ branch: %empty
 |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch //only ifelse needed for lab implementation rn
 |ELSE L_BRACE statements R_BRACE {
   ifelse = true;
-  
+  CodeNode* node = new CodeNode();
+  node->code += $3->code;
+  $$ = node; 
 }
       ;
 
@@ -351,7 +354,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
-  $$ = new CodeNode;
+  $$ = new CodeNode();
   $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
   //$$ = node;
