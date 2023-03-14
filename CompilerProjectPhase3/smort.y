@@ -17,7 +17,7 @@
 char *identToken;
 int numberToken;
 int count_names = 0;
-
+int count_ifs = 0;
 
 enum Type {Integer, Array};
 struct Variable{
@@ -106,6 +106,12 @@ std::string temp_var_incrementer(){
    return new_temp_var.str();
 }
 
+std::string temp_if_incrementer(){
+   std::stringstream new_temp_if;
+   new_temp_if << std::string("if_true") << count_ifs;
+   ++count_ifs;
+   return new_temp_if.str();
+}
 %}
 
 %union{
@@ -251,11 +257,11 @@ statement:variable_declaration
          |input_output
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE  {
-          //bring conditions up
-          //need to create an if counter
+          //need to create if checks in here lol
+          std::string temp_if = temp_if_incrementer();
           CodeNode* node = new CodeNode();
           node->code += $3->code;
-          node->code += std::string("?:= if_true0,") + std::string($3->name) + std::string("\n");
+          node->code += std::string("?:= ") + temp_if + std::string(", ") + std::string($3->name) + std::string("\n");
           node->code += $6->code;
 
           $$ = node;
