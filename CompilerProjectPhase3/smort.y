@@ -6,6 +6,7 @@
   #include <sstream>
   #include <vector>
   #include <string>
+  #include <stdbool.h>
   #include "y.tab.h"
   extern FILE* yyin;
   //Below code is from practice lab 3
@@ -19,6 +20,7 @@ int numberToken;
 int count_names = 0;
 int count_ifs = 0;
 int count_else = 0;
+bool ifelse = false;
 
 enum Type {Integer, Array};
 struct Variable{
@@ -267,11 +269,13 @@ statement:variable_declaration
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch{
           //need to create if checks in here lol
           std::string temp_if = temp_if_incrementer();
-          std::string temp_else = std::string("else0");
           CodeNode* node = new CodeNode();
           node->code += $3->code;
           node->code += std::string("?:= ") + temp_if + std::string(", ") + std::string($3->name) + std::string("\n");
-          node->code += std::string(":= ") + temp_else + std::string("\n");
+          if (ifelse) {
+            std::string temp_else = temp_else_incrementer();
+            node->code += std::string(":= ") + temp_else + std::string("\n");
+          }
           node->code += $6->code;
 
           $$ = node;
