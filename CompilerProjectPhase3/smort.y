@@ -121,6 +121,7 @@ std::string temp_endif_incrementer() {
   std::stringstream new_temp_endif;
   new_temp_endif << std::string("endif") << count_endif;
   ++count_endif;
+  return new_temp_endif.str();
 }
 
 std::string temp_else_incrementer(){
@@ -276,6 +277,7 @@ statement:variable_declaration
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch{
           //need to create if checks in here lol
           std::string temp_if = temp_if_incrementer();
+          std::string temp_endif = temp_endif_incrementer();
           CodeNode* node = new CodeNode();
           node->code += $3->code;
           node->code += std::string("?:= ") + temp_if + std::string(", ") + std::string($3->name) + std::string("\n");
@@ -288,8 +290,10 @@ statement:variable_declaration
           else {
             node->code += std::string(": ") + temp_if + std::string("\n");
             node->code += $6->code;
+            node->code += std::string(":= ") + temp_endif + std::string("\n");
           }
 
+          node->code += std::string(": ") + temp_endif + std::string("\n");
           $$ = node;
 
          }

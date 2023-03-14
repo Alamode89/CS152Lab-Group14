@@ -3,7 +3,7 @@ main {
   int y;
   int z;
   if (x < y) {
-    x = 5 + 1;
+    x = y;
   }
   else {
     //x = 1;
