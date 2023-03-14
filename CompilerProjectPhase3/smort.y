@@ -433,7 +433,11 @@ term: sign NUMBER {
     $$->name = $1;
 }
 |arr_access
-|L_PAREN expression R_PAREN 
+|L_PAREN expression R_PAREN {
+  $$ = new CodeNode();
+  $$->code = $2->code;
+  $$->name = $2->name;
+}
 |IDENTIFIER L_PAREN args R_PAREN {//*********Function Call
     CodeNode *node = new CodeNode;
     std::string name = $1;
