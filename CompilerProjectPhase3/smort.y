@@ -125,7 +125,7 @@ std::string temp_var_incrementer(){
 }
 
 %type <node> functions function main statements term expression variable_declaration statement sign var_assignment
-%type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
+%type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args 
 
 
 %start prog_start
@@ -437,7 +437,7 @@ sign: %empty{
       CodeNode *node = new CodeNode;
       $$ = node;
     }
-    |MINUS 
+    |MINUS
     ;
 
 conditions: condition 
@@ -453,12 +453,12 @@ bool_statement: term bool_operation term
               |FALSE 
               ;
 
-bool_operation: GREATER_THAN 
-              |LESS_THAN 
-              |GTE 
-              |LTE 
-              |EQUAL_TO 
-              |NOT_EQUAL 
+bool_operation: GREATER_THAN
+              |LESS_THAN
+              |GTE
+              |LTE
+              |EQUAL_TO
+              |NOT_EQUAL
               ;
 
 %%
