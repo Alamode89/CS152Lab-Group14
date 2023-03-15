@@ -51,7 +51,7 @@ Function *get_function() {
 
 bool find(const std::string &value) {
   Function *f = get_function();
-  for(int i = 0; i < f->declarations.size(); i++) {
+  for (int i = 0; i < f->declarations.size(); i++) {
     Variable *v = &f->declarations[i];
     if(v->name == value){
       return true;
@@ -95,7 +95,7 @@ void checkVarDuplicate(const std::string val) {
 
 void isVarDeclared(const std::string val) {
   if (!find(val)) {
-    std::string msg = "Error: variable '" + val + "' is not declared\n";
+    std::string msg = "Error: variable '" + val + "' is not declared";
     yyerror(msg.c_str());
   }
 }
@@ -201,8 +201,8 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
         
          CodeNode *node = new CodeNode;
          std::string func_name = $3;
-         checkFuncDef(func_name);
          add_function_to_symbol_table(func_name);
+         checkFuncDef(func_name);
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
@@ -247,7 +247,7 @@ argument:%empty {
          node->code = "";
          std::string id = $2;
          Type t = Integer;
-         add_variable_to_symbol_table(id, t);
+         
          node->code += std::string(". ") + id + std::string("\n");
          $$ = node;
         }
@@ -351,7 +351,6 @@ branch: %empty
 
 variable_declaration: INTEGER IDENTIFIER SEMICOLON
 {
-  
   Type t = Integer;
   std::string var_name = $2;
   checkVarDuplicate(var_name);
