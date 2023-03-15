@@ -247,7 +247,8 @@ argument:%empty {
          node->code = "";
          std::string id = $2;
          Type t = Integer;
-         
+         //add var broken, id seems to be passing bxw to the function, not sure why
+         add_variable_to_symbol_table(id, t);
          node->code += std::string(". ") + id + std::string("\n");
          $$ = node;
         }
@@ -365,6 +366,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 var_assignment: IDENTIFIER EQUAL expression SEMICOLON {
   std::string variable = $1;
   std::string value = $3->name;
+  // isvardeclared broken as a result of adding var to symbol table for function call not working
   isVarDeclared(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
