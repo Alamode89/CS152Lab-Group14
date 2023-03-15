@@ -1,0 +1,20 @@
+func add
+. a
+. b
+ret _temp0
+endfunc
+
+func main
+. a
+. b
+. c
+. d
+= a, 100
+= b, 50
+param a
+param b
+. _temp1
+call add, _temp1
+= c, _temp1
+.> c
+endfunc
