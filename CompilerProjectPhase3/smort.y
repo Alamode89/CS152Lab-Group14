@@ -74,7 +74,7 @@ void add_variable_to_symbol_table(std::string &value, Type t) {
   f->declarations.push_back(v);
 }
 
-void print_symbol_table(void){
+void print_symbol_table(void) {
   printf("symbol table:\n");
   printf("--------------------\n");
   for(int i =0; i < symbol_table.size();i++) {
@@ -93,9 +93,18 @@ void checkVarDuplicate(const std::string val) {
   }
 }
 
-void isVarDeclared(const std::string val){
+void isVarDeclared(const std::string val) {
   if (!find(val)) {
     std::string msg = "Error: variable '" + val + "' is not declared\n";
+    yyerror(msg.c_str());
+  }
+}
+
+void isVarIllegal(const std::string val) {
+  if (val == "if" || val == "else" || val == "elif"  || val == "int" || val == "while" ||
+     val == "whileo" || val == "break" || val == "read" || val == "write" || val == "func" ||
+     val == "return" || val == "arr" || val == "main"){
+    std::string msg = "Error: variable '" + val + "' is a illegal because it is a reserved word";
     yyerror(msg.c_str());
   }
 }
@@ -182,12 +191,12 @@ prog_start: functions
 
 ;
 
-functions: %empty{
+functions: %empty {
           
           CodeNode *node = new CodeNode;
           $$ = node;
 }
-         |function functions{
+         |function functions {
 
           CodeNode *node1 = $1;
           CodeNode *node2 = $2;
@@ -226,7 +235,6 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
           ;
 
 arguments: argument{
-          
           CodeNode *node = $1;
           $$ = node;
 }
@@ -238,8 +246,7 @@ arguments: argument{
 }
          ;
 
-argument:%empty{
-
+argument:%empty {
          CodeNode *node = new CodeNode;
          $$ = node;
         }
@@ -254,8 +261,7 @@ argument:%empty{
         }
         ;
 
-main:MAIN L_BRACE statements R_BRACE 
-  {
+main:MAIN L_BRACE statements R_BRACE {
     //printf("%s\n", "func main");
     CodeNode* node = new CodeNode;
     node->code = "";
@@ -273,7 +279,7 @@ main:MAIN L_BRACE statements R_BRACE
   }
 ;
 
-statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
+statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node; }
           |statement statements {
             CodeNode* node = new CodeNode;
             node->code = $1->code + $2->code;
@@ -287,7 +293,7 @@ statement:variable_declaration
          |var_assignment
          |input_output
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
-         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch{
+         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch {
           //need to create if checks in here lol
           std::string temp_if = temp_if_incrementer();
           std::string temp_endif = temp_endif_incrementer();
@@ -365,10 +371,11 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 }
 ;
 
-var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
+var_assignment: IDENTIFIER EQUAL expression SEMICOLON {
   std::string variable = $1;
   std::string value = $3->name;
   isVarDeclared(variable);
+  isVarIllegal(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
@@ -504,7 +511,7 @@ mlt_args:expression {
         }
         ;
 
-sign: %empty{
+sign: %empty {
       CodeNode *node = new CodeNode;
       $$ = node;
     }
