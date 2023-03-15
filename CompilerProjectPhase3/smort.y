@@ -100,15 +100,6 @@ void isVarDeclared(const std::string val) {
   }
 }
 
-void isVarIllegal(const std::string val) {
-  if (val == "if" || val == "else" || val == "elif"  || val == "int" || val == "while" ||
-     val == "whileo" || val == "break" || val == "read" || val == "write" || val == "func" ||
-     val == "return" || val == "arr" || val == "main"){
-    std::string msg = "Error: variable '" + val + "' is a illegal because it is a reserved word";
-    yyerror(msg.c_str());
-  }
-}
-
 void checkFuncDef(const std::string val){
   for (int i = 0; i < symbol_table.size(); i++){
     if (symbol_table.at(i).name == val){
@@ -375,7 +366,6 @@ var_assignment: IDENTIFIER EQUAL expression SEMICOLON {
   std::string variable = $1;
   std::string value = $3->name;
   isVarDeclared(variable);
-  isVarIllegal(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
