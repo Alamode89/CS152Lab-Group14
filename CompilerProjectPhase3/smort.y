@@ -44,12 +44,12 @@ bool foundInVec(std::vector<Variable> vec, std::string& value) {
   return false;
 }
 
-Function *get_function() {
+Function *get_function(){
   int final = symbol_table.size()-1;
   return &symbol_table[final];
 }
 
-bool find(const std::string &value) {
+bool find(const std::string &value){
   Function *f = get_function();
   for(int i = 0; i < f->declarations.size(); i++) {
     Variable *v = &f->declarations[i];
@@ -89,13 +89,6 @@ void print_symbol_table(void) {
 void checkVarDuplicate(const std::string val) {
   if (find(val)) {
     std::string msg = "Error: duplicate declaration of variable '" + val + "'";
-    yyerror(msg.c_str());
-  }
-}
-
-void isVarDeclared(const std::string val) {
-  if (!find(val)) {
-    std::string msg = "Error: variable '" + val + "' is not declared\n";
     yyerror(msg.c_str());
   }
 }
@@ -201,8 +194,6 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
         
          CodeNode *node = new CodeNode;
          std::string func_name = $3;
-         checkFuncDef(func_name);
-         add_function_to_symbol_table(func_name);
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
@@ -246,8 +237,6 @@ argument:%empty {
          CodeNode *node = new CodeNode;
          node->code = "";
          std::string id = $2;
-         Type t = Integer;
-         add_variable_to_symbol_table(id, t);
          node->code += std::string(". ") + id + std::string("\n");
          $$ = node;
         }
@@ -320,7 +309,6 @@ statement:variable_declaration
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
   Type t = Integer;
   std::string arr_name = $2;
-  checkVarDuplicate(arr_name);
   add_variable_to_symbol_table(arr_name, t);
   std::string arr_size = $6->name;
   $$ = new CodeNode();
@@ -366,7 +354,6 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 var_assignment: IDENTIFIER EQUAL expression SEMICOLON {
   std::string variable = $1;
   std::string value = $3->name;
-  isVarDeclared(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
@@ -574,5 +561,4 @@ int main (int argc, char** argv) {
 
 void yyerror(const char *msg) {
   printf("**  Line %d: %s\n", row, msg);
-  exit(1);
 }
