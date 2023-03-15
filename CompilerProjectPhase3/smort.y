@@ -44,12 +44,12 @@ bool foundInVec(std::vector<Variable> vec, std::string& value) {
   return false;
 }
 
-Function *get_function() {
+Function *get_function(){
   int final = symbol_table.size()-1;
   return &symbol_table[final];
 }
 
-bool find(const std::string &value) {
+bool find(const std::string &value){
   Function *f = get_function();
   for(int i = 0; i < f->declarations.size(); i++) {
     Variable *v = &f->declarations[i];
@@ -74,7 +74,7 @@ void add_variable_to_symbol_table(std::string &value, Type t) {
   f->declarations.push_back(v);
 }
 
-void print_symbol_table(void) {
+void print_symbol_table(void){
   printf("symbol table:\n");
   printf("--------------------\n");
   for(int i =0; i < symbol_table.size();i++) {
@@ -89,13 +89,6 @@ void print_symbol_table(void) {
 void checkVarDuplicate(const std::string val) {
   if (find(val)) {
     std::string msg = "Error: duplicate declaration of variable '" + val + "'";
-    yyerror(msg.c_str());
-  }
-}
-
-void isVarDeclared(const std::string val) {
-  if (!find(val)) {
-    std::string msg = "Error: variable '" + val + "' is not declared\n";
     yyerror(msg.c_str());
   }
 }
@@ -182,12 +175,12 @@ prog_start: functions
 
 ;
 
-functions: %empty {
+functions: %empty{
           
           CodeNode *node = new CodeNode;
           $$ = node;
 }
-         |function functions {
+         |function functions{
 
           CodeNode *node1 = $1;
           CodeNode *node2 = $2;
@@ -201,8 +194,6 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
         
          CodeNode *node = new CodeNode;
          std::string func_name = $3;
-         checkFuncDef(func_name);
-         add_function_to_symbol_table(func_name);
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
@@ -227,6 +218,7 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
           ;
 
 arguments: argument{
+          
           CodeNode *node = $1;
           $$ = node;
 }
@@ -238,7 +230,8 @@ arguments: argument{
 }
          ;
 
-argument:%empty {
+argument:%empty{
+
          CodeNode *node = new CodeNode;
          $$ = node;
         }
@@ -246,14 +239,13 @@ argument:%empty {
          CodeNode *node = new CodeNode;
          node->code = "";
          std::string id = $2;
-         Type t = Integer;
-         add_variable_to_symbol_table(id, t);
          node->code += std::string(". ") + id + std::string("\n");
          $$ = node;
         }
         ;
 
-main:MAIN L_BRACE statements R_BRACE {
+main:MAIN L_BRACE statements R_BRACE 
+  {
     //printf("%s\n", "func main");
     CodeNode* node = new CodeNode;
     node->code = "";
@@ -271,7 +263,7 @@ main:MAIN L_BRACE statements R_BRACE {
   }
 ;
 
-statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node; }
+statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
           |statement statements {
             CodeNode* node = new CodeNode;
             node->code = $1->code + $2->code;
@@ -285,7 +277,7 @@ statement:variable_declaration
          |var_assignment
          |input_output
          |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
-         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch {
+         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch{
           //need to create if checks in here lol
           std::string temp_if = temp_if_incrementer();
           std::string temp_endif = temp_endif_incrementer();
@@ -320,7 +312,6 @@ statement:variable_declaration
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
   Type t = Integer;
   std::string arr_name = $2;
-  checkVarDuplicate(arr_name);
   add_variable_to_symbol_table(arr_name, t);
   std::string arr_size = $6->name;
   $$ = new CodeNode();
@@ -363,10 +354,9 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 }
 ;
 
-var_assignment: IDENTIFIER EQUAL expression SEMICOLON {
+var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
-  isVarDeclared(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
@@ -502,7 +492,7 @@ mlt_args:expression {
         }
         ;
 
-sign: %empty {
+sign: %empty{
       CodeNode *node = new CodeNode;
       $$ = node;
     }
@@ -574,5 +564,4 @@ int main (int argc, char** argv) {
 
 void yyerror(const char *msg) {
   printf("**  Line %d: %s\n", row, msg);
-  exit(1);
 }

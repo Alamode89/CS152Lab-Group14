@@ -1,19 +1,18 @@
+func int tst1(int x){
+  x = 4;
+ return x;
+}
+func int tst2(int y){
+  y = 9;
+ return 9;
+}
 main {
-  int a = arr[20];
-  int b;
-  int c;
-  b = 3;
-  c = 5;
-  a[0] = b+c;
-  write(a[0]);
-
-  a[1] = 100;
-  write(a[1]);
-
-  a[2] = 200;
-  write(a[2]);
-
-  a[3] = a[0] * (a[1] + c);
-  write(a[3]);
- // x[0] = x[1] * (x[3] + 5);
+    int x;
+    int y;
+    int z;
+    int z;
+    x = 5;
+    y = 2;
+    read(y);
+    write(x);
 }
