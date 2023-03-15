@@ -5,9 +5,12 @@ func int factorial(int x) {
 
 main
 {
-int b = 5;
-int x = 3;
-int w = b+x;
+int b;
+b = 5;
+int x;
+x = 3;
+int w;
+w = b+x;
 read(b);
 x = z(b, x);
 }
