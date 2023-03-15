@@ -161,7 +161,7 @@ std::string new_label_incrementer(){
 %type <node> bool_statement bool_operation branch
 
 %start prog_start
-%token PLUS MINUS MULT DIV L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
+%token PLUS MINUS MULT DIV MOD L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
 %token <op_val> NUMBER IDENTIFIER
 %token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY MAIN
 
@@ -447,6 +447,11 @@ operation: PLUS {
 |DIV {
   $$ = new CodeNode();
   char e[] = "/";
+  $$->name = e;
+}
+|MOD{
+  $$ = new CodeNode();
+  char e[] = "%";
   $$->name = e;
 }
 ;

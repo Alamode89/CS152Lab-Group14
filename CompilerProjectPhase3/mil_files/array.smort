@@ -1,0 +1,12 @@
+main
+{
+    int a = arr[20];
+    int b;
+    int c;
+
+    b = 3;
+    c = 5;
+
+    arr[0] = b + c;
+    write(arr[0]);
+}

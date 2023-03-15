@@ -25,6 +25,7 @@ LINE_COMMENT "\/\/".*"\n"
 "-"                 {col++;return MINUS;}
 "*"                 {col++;return MULT;}
 "/"                 {col++;return DIV;}
+"%"                 {col++;return MOD;}
 "("                 {col++;return L_PAREN;}
 ")"                 {col++;return R_PAREN;}
 "="                 {col++;return EQUAL;}

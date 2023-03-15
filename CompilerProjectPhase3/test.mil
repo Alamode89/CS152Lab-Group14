@@ -1,0 +1,30 @@
+func main
+. i
+. j
+. k
+= i, 0
+= j, 5
+= k, 100
+: _label0
+. _temp0
+< _temp0, i, 10
+?:= _label1, _temp0
+:= _label2
+: _label1
+. _temp1
++ _temp1, i, 1
+= i, _temp1
+.> i
+. _temp2
+== _temp2, i, 5
+?:= if_true0, _temp2
+:= else0
+: if_true0
+.> j
+:= endif0
+: else0
+.> k
+: endif0
+:= _label0
+: _label2
+endfunc
