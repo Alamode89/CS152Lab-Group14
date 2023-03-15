@@ -201,6 +201,7 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
         
          CodeNode *node = new CodeNode;
          std::string func_name = $3;
+         checkFuncDef(func_name);
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
