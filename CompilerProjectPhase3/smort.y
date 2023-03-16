@@ -21,7 +21,9 @@ int count_names = 0;
 int count_ifs = 0;
 int count_endif = 0;
 int count_else = 0;
-int count_labels = 0; //count number of labels created
+int count_loops = 0; //count number of labels created
+int count_loop_body = 0;
+int count_loop_end = 0;
 int count_params = 0;
 bool ifelse = false;
 
@@ -140,11 +142,25 @@ std::string temp_else_incrementer(){
    return new_temp_else.str();
 }
 
-std::string new_label_incrementer(){
-  std::stringstream new_label;
-  new_label << std::string("_label") << count_labels;
-  ++count_labels;
-  return new_label.str();
+std::string new_begin_loop_incrementer(){
+  std::stringstream new_loop;
+  new_loop << std::string("_beginloop") << count_loop;
+  ++count_loop;
+  return new_loop.str();
+}
+
+std::string new_body_loop_incrementer(){
+  std::stringstream new_loop;
+  new_loop << std::string("_loopbody") << count_loop_body;
+  ++count_loop_body;
+  return new_loop.str();
+}
+
+std::string new_end_loop_incrementer(){
+  std::stringstream new_loop;
+  new_loop << std::string("_endloop") << count_loop_end;
+  ++count_loop_end;
+  return new_loop.str();
 }
 
 std::string new_param_incrementer(){
@@ -356,6 +372,7 @@ statement:variable_declaration
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
          |array_declaration
          |array_assignment
+         |BREAK
          ;
 
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
