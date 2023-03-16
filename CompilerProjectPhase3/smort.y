@@ -21,7 +21,9 @@ int count_names = 0;
 int count_ifs = 0;
 int count_endif = 0;
 int count_else = 0;
-int count_labels = 0; //count number of labels created
+int count_loops = 0; //count number of labels created
+int count_loop_body = 0;
+int count_loop_end = 0;
 int count_params = 0;
 bool ifelse = false;
 
@@ -140,11 +142,25 @@ std::string temp_else_incrementer(){
    return new_temp_else.str();
 }
 
-std::string new_label_incrementer(){
-  std::stringstream new_label;
-  new_label << std::string("_label") << count_labels;
-  ++count_labels;
-  return new_label.str();
+std::string new_begin_loop_incrementer(){
+  std::stringstream new_loop;
+  new_loop << std::string("beginloop") << count_loops;
+  ++count_loops;
+  return new_loop.str();
+}
+
+std::string new_body_loop_incrementer(){
+  std::stringstream new_loop;
+  new_loop << std::string("loopbody") << count_loop_body;
+  ++count_loop_body;
+  return new_loop.str();
+}
+
+std::string new_end_loop_incrementer(){
+  std::stringstream new_loop;
+  new_loop << std::string("endloop") << count_loop_end;
+  ++count_loop_end;
+  return new_loop.str();
 }
 
 std::string new_param_incrementer(){
@@ -174,7 +190,7 @@ std::string new_param_incrementer(){
 
 %type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions
 %type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
-%type <node> bool_statement bool_operation branch
+%type <node> bool_statement bool_operation branch BREAK
 
 %start prog_start
 %token PLUS MINUS MULT DIV MOD L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
@@ -312,9 +328,9 @@ statement:variable_declaration
           CodeNode *node = new CodeNode(); 
           CodeNode *conditions_node = $3; //get code from conditions
           CodeNode *statements_node = $6; //get code from statements
-          std::string label_start = new_label_incrementer();
-          std::string label_body = new_label_incrementer();
-          std::string label_end = new_label_incrementer();
+          std::string label_start = new_begin_loop_incrementer();
+          std::string label_body = new_body_loop_incrementer();
+          std::string label_end = new_end_loop_incrementer();
           node->code += std::string(": ") + label_start + std::string("\n");
           node->code += conditions_node->code;
           node->code += std::string("?:= ") + label_body + std::string(", ") + conditions_node->name + std::string("\n");
@@ -344,9 +360,9 @@ statement:variable_declaration
             node->code += $8->code;
           }
           else {
+            node->code += std::string(":= ") + temp_endif + std::string("\n");
             node->code += std::string(": ") + temp_if + std::string("\n");
             node->code += $6->code;
-            node->code += std::string(":= ") + temp_endif + std::string("\n");
           }
 
           node->code += std::string(": ") + temp_endif + std::string("\n");
@@ -356,6 +372,14 @@ statement:variable_declaration
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
          |array_declaration
          |array_assignment
+         |BREAK SEMICOLON {
+          CodeNode* node = new CodeNode();
+          std::stringstream b;
+          b << std::string("endloop") << count_loop_end;
+          node->code = std::string(":= ") + b.str() + std::string("\n");
+          $$ = node;
+         }
+       //  |CONTINUE
          ;
 
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
