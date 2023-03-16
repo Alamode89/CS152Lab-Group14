@@ -53,7 +53,7 @@ Function *get_function(){
 
 bool find(const std::string &value){
   Function *f = get_function();
-  for(int i = 0; i < f->declarations.size(); i++) {
+  for (int i = 0; i < f->declarations.size(); i++) {
     Variable *v = &f->declarations[i];
     if(v->name == value){
       return true;
@@ -91,6 +91,13 @@ void print_symbol_table(void){
 void checkVarDuplicate(const std::string val) {
   if (find(val)) {
     std::string msg = "Error: duplicate declaration of variable '" + val + "'";
+    yyerror(msg.c_str());
+  }
+}
+
+void isVarDeclared(const std::string val) {
+  if (!find(val)) {
+    std::string msg = "Error: variable '" + val + "' is not declared";
     yyerror(msg.c_str());
   }
 }
@@ -207,26 +214,30 @@ functions: %empty{
 }
          ;
 //{add_function_to_symbol_table($3)}
-function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
-        
-         CodeNode *node = new CodeNode;
+function: FUNCTION INTEGER IDENTIFIER {
+        std::string func_name = $3;
+        add_function_to_symbol_table(func_name);
+} L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
          std::string func_name = $3;
+         CodeNode *node = new CodeNode;
+         checkFuncDef(func_name);
+         print_symbol_table();
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
          //printf("%s\n", node->code.c_str());
           //add the argument code
-          CodeNode *arguments = $5;
+          CodeNode *arguments = $6;
           node->code += arguments->code;
 
           //add the local declarations/statements
-          CodeNode *statements = $8;
+          CodeNode *statements = $9;
           node->code += statements->code;
 
          //add the return statement
          CodeNode *returns = new CodeNode;
-         std::string expression = $10->name;
-         node->code += $10->code;
+         std::string expression = $11->name;
+         node->code += $11->code;
          returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
          node->code += returns->code;
 
@@ -258,6 +269,8 @@ argument:%empty{
          std::string temp_param = new_param_incrementer();
          node->code = "";
          std::string id = $2;
+         Type t = Integer;
+         add_variable_to_symbol_table(id, t);
          node->code += std::string(". ") + id + std::string("\n");
          node->code += std::string("= ") + id + std::string(", ") + temp_param + std::string("\n");
          $$ = node;
@@ -382,7 +395,6 @@ branch: %empty{
 
 variable_declaration: INTEGER IDENTIFIER SEMICOLON
 {
-  
   Type t = Integer;
   std::string var_name = $2;
   checkVarDuplicate(var_name);
@@ -397,6 +409,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
+  isVarDeclared(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
   $$->code += std::string("= ") + variable + std::string(", ") + value + std::string("\n");
@@ -613,4 +626,5 @@ int main (int argc, char** argv) {
 
 void yyerror(const char *msg) {
   printf("**  Line %d: %s\n", row, msg);
+  exit(1);
 }
