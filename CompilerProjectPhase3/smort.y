@@ -221,7 +221,6 @@ function: FUNCTION INTEGER IDENTIFIER {
          std::string func_name = $3;
          CodeNode *node = new CodeNode;
          checkFuncDef(func_name);
-         print_symbol_table();
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
