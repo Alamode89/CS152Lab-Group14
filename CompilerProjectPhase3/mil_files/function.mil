@@ -26,14 +26,12 @@ func main
 = a, 100
 = b, 50
 param a
-. _temp2
 param b
 . _temp3
 call add, _temp3
 = c, _temp3
 .> c
 param c
-. _temp5
 . _temp4
 + _temp4, a, b
 param _temp4
