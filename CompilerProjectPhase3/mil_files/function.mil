@@ -1,6 +1,10 @@
 func add
 . a
+= a, $0
 . b
+= b, $1
+. _temp0
++ _temp0, a, b
 ret _temp0
 endfunc
 

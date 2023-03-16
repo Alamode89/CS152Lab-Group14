@@ -22,6 +22,7 @@ int count_ifs = 0;
 int count_endif = 0;
 int count_else = 0;
 int count_labels = 0; //count number of labels created
+int count_params = 0;
 bool ifelse = false;
 
 enum Type {Integer, Array};
@@ -138,6 +139,14 @@ std::string new_label_incrementer(){
   ++count_labels;
   return new_label.str();
 }
+
+std::string new_param_incrementer(){
+  std::stringstream new_param;
+  new_param << std::string("$") << count_params;
+  ++count_params;
+  return new_param.str();
+}
+
 %}
 
 %union{
@@ -217,6 +226,7 @@ function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statemen
          //add the return statement
          CodeNode *returns = new CodeNode;
          std::string expression = $10->name;
+         node->code += $10->code;
          returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
          node->code += returns->code;
 
@@ -245,9 +255,11 @@ argument:%empty{
         }
         |INTEGER IDENTIFIER{
          CodeNode *node = new CodeNode;
+         std::string temp_param = new_param_incrementer();
          node->code = "";
          std::string id = $2;
          node->code += std::string(". ") + id + std::string("\n");
+         node->code += std::string("= ") + id + std::string(", ") + temp_param + std::string("\n");
          $$ = node;
         }
         ;
