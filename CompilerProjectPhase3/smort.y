@@ -144,8 +144,8 @@ std::string temp_else_incrementer(){
 
 std::string new_begin_loop_incrementer(){
   std::stringstream new_loop;
-  new_loop << std::string("_beginloop") << count_loop;
-  ++count_loop;
+  new_loop << std::string("_beginloop") << count_loops;
+  ++count_loops;
   return new_loop.str();
 }
 
@@ -328,9 +328,9 @@ statement:variable_declaration
           CodeNode *node = new CodeNode(); 
           CodeNode *conditions_node = $3; //get code from conditions
           CodeNode *statements_node = $6; //get code from statements
-          std::string label_start = new_label_incrementer();
-          std::string label_body = new_label_incrementer();
-          std::string label_end = new_label_incrementer();
+          std::string label_start = new_begin_loop_incrementer();
+          std::string label_body = new_body_loop_incrementer();
+          std::string label_end = new_end_loop_incrementer();
           node->code += std::string(": ") + label_start + std::string("\n");
           node->code += conditions_node->code;
           node->code += std::string("?:= ") + label_body + std::string(", ") + conditions_node->name + std::string("\n");
