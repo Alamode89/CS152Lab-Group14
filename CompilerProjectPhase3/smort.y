@@ -536,7 +536,6 @@ mlt_args:expression {//$1->code gives +_temp3, a,b $1->name gives
         node->code = "";
         //below is all new
         std::string temp = temp_var_incrementer();//temporary variable for the function call destination
-        printf("new temp created: %s\n", temp.c_str());
         node->code += std::string(". ") + temp + std::string("\n");
         node->code += $1->code;
         //above is all new
