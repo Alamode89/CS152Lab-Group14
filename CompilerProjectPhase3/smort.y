@@ -221,7 +221,7 @@ function: FUNCTION INTEGER IDENTIFIER {
          std::string func_name = $3;
          CodeNode *node = new CodeNode;
          checkFuncDef(func_name);
-         print_symbol_table();
+         //print_symbol_table();
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
@@ -240,7 +240,7 @@ function: FUNCTION INTEGER IDENTIFIER {
          node->code += $11->code;
          returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
          node->code += returns->code;
-
+         count_params = 0; //reset parameter counter
          node->code += std::string("endfunc\n") + std::string("\n");
          $$ = node;
 }
@@ -498,10 +498,10 @@ term: sign NUMBER {
 }
 |IDENTIFIER L_PAREN args R_PAREN {//*********Function Call
     CodeNode *node = new CodeNode;
-    std::string name = $1;
+    std::string name = $1; //name = name of identifier
     std::string temp = temp_var_incrementer();//temporary variable for the function call destination
     node->code += $3->code;//add paramaters to beginning of node 
-    node->code += std::string(". ") + temp + std::string("\n");//next add the temporary variable declaration to the node
+    node->code += std::string(". ") + temp + std::string("\n");//next add the temporary variable declaration to the node 
     node->code += std::string("call ") + name + std::string(", ") + temp + std::string("\n");//actual function call 
     node->name = temp;
     $$ = node;
@@ -530,13 +530,20 @@ args:%empty {
     }
     ;
 
-mlt_args:expression {
+mlt_args:expression {//$1->code gives +_temp3, a,b $1->name gives  
         CodeNode *node = new CodeNode; //new line added
         std::string param = $1->name; 
         node->code = "";
+        //below is all new
+        std::string temp = temp_var_incrementer();//temporary variable for the function call destination
+        printf("new temp created: %s\n", temp.c_str());
+        node->code += std::string(". ") + temp + std::string("\n");
+        node->code += $1->code;
+        //above is all new
+
         node->code += std::string("param ") + param + std::string("\n");
-        //printf("%s\n", node->code.c_str());
-        $$ = node; //new line added*/
+        //printf("Check this is a math exp %s\n", node->code.c_str()); //comment this all out
+        $$ = node; //new line added
         }
         |expression COMMA mlt_args {
         CodeNode *node1 = new CodeNode;
