@@ -144,21 +144,21 @@ std::string temp_else_incrementer(){
 
 std::string new_begin_loop_incrementer(){
   std::stringstream new_loop;
-  new_loop << std::string("_beginloop") << count_loops;
+  new_loop << std::string("beginloop") << count_loops;
   ++count_loops;
   return new_loop.str();
 }
 
 std::string new_body_loop_incrementer(){
   std::stringstream new_loop;
-  new_loop << std::string("_loopbody") << count_loop_body;
+  new_loop << std::string("loopbody") << count_loop_body;
   ++count_loop_body;
   return new_loop.str();
 }
 
 std::string new_end_loop_incrementer(){
   std::stringstream new_loop;
-  new_loop << std::string("_endloop") << count_loop_end;
+  new_loop << std::string("endloop") << count_loop_end;
   ++count_loop_end;
   return new_loop.str();
 }
