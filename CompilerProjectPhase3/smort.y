@@ -21,6 +21,7 @@ int count_names = 0;
 int count_ifs = 0;
 int count_endif = 0;
 int count_else = 0;
+int count_labels = 0; //count number of labels created
 bool ifelse = false;
 
 enum Type {Integer, Array};
@@ -44,12 +45,12 @@ bool foundInVec(std::vector<Variable> vec, std::string& value) {
   return false;
 }
 
-Function *get_function() {
+Function *get_function(){
   int final = symbol_table.size()-1;
   return &symbol_table[final];
 }
 
-bool find(const std::string &value) {
+bool find(const std::string &value){
   Function *f = get_function();
   for (int i = 0; i < f->declarations.size(); i++) {
     Variable *v = &f->declarations[i];
@@ -74,7 +75,7 @@ void add_variable_to_symbol_table(std::string &value, Type t) {
   f->declarations.push_back(v);
 }
 
-void print_symbol_table(void) {
+void print_symbol_table(void){
   printf("symbol table:\n");
   printf("--------------------\n");
   for(int i =0; i < symbol_table.size();i++) {
@@ -137,6 +138,13 @@ std::string temp_else_incrementer(){
    ++count_else;
    return new_temp_else.str();
 }
+
+std::string new_label_incrementer(){
+  std::stringstream new_label;
+  new_label << std::string("_label") << count_labels;
+  ++count_labels;
+  return new_label.str();
+}
 %}
 
 %union{
@@ -144,7 +152,7 @@ std::string temp_else_incrementer(){
   int int_val;
 
   struct CodeNode *node;
-
+  
   struct S{
     char *code;
   } statement;
@@ -182,12 +190,12 @@ prog_start: functions
 
 ;
 
-functions: %empty {
+functions: %empty{
           
           CodeNode *node = new CodeNode;
           $$ = node;
 }
-         |function functions {
+         |function functions{
 
           CodeNode *node1 = $1;
           CodeNode *node2 = $2;
@@ -229,6 +237,7 @@ function: FUNCTION INTEGER IDENTIFIER {
           ;
 
 arguments: argument{
+          
           CodeNode *node = $1;
           $$ = node;
 }
@@ -240,7 +249,8 @@ arguments: argument{
 }
          ;
 
-argument:%empty {
+argument:%empty{
+
          CodeNode *node = new CodeNode;
          $$ = node;
         }
@@ -256,7 +266,8 @@ argument:%empty {
         }
         ;
 
-main:MAIN L_BRACE statements R_BRACE {
+main:MAIN L_BRACE statements R_BRACE 
+  {
     //printf("%s\n", "func main");
     CodeNode* node = new CodeNode;
     node->code = "";
@@ -274,7 +285,7 @@ main:MAIN L_BRACE statements R_BRACE {
   }
 ;
 
-statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node; }
+statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node;}
           |statement statements {
             CodeNode* node = new CodeNode;
             node->code = $1->code + $2->code;
@@ -287,8 +298,25 @@ statements: %empty { CodeNode *node = new CodeNode(); node->code = ""; $$ = node
 statement:variable_declaration
          |var_assignment
          |input_output
-         |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE 
-         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch {
+         |WHILE L_PAREN conditions R_PAREN L_BRACE statements R_BRACE {
+          CodeNode *node = new CodeNode(); 
+          CodeNode *conditions_node = $3; //get code from conditions
+          CodeNode *statements_node = $6; //get code from statements
+          std::string label_start = new_label_incrementer();
+          std::string label_body = new_label_incrementer();
+          std::string label_end = new_label_incrementer();
+          node->code += std::string(": ") + label_start + std::string("\n");
+          node->code += conditions_node->code;
+          node->code += std::string("?:= ") + label_body + std::string(", ") + conditions_node->name + std::string("\n");
+          node->code += std::string(":= ") + label_end + std::string("\n");
+          node->code += std::string(": ") + label_body + std::string("\n");
+          node->code += statements_node->code;
+          node->code += std::string(":= ") + label_start + std::string("\n");
+          node->code += std::string(": ") + label_end + std::string("\n");
+
+          $$ = node; 
+         }
+         |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch{
           //need to create if checks in here lol
           std::string temp_if = temp_if_incrementer();
           std::string temp_endif = temp_endif_incrementer();
@@ -323,7 +351,6 @@ statement:variable_declaration
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
   Type t = Integer;
   std::string arr_name = $2;
-  checkVarDuplicate(arr_name);
   add_variable_to_symbol_table(arr_name, t);
   std::string arr_size = $6->name;
   $$ = new CodeNode();
@@ -342,7 +369,10 @@ array_assignment: IDENTIFIER L_BRACK term R_BRACK EQUAL expression SEMICOLON {
 }
 ;
 
-branch: %empty
+branch: %empty{
+  CodeNode *node = new CodeNode;
+  $$ = node;
+}
 |ELIF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch //only ifelse needed for lab implementation rn
 |ELSE L_BRACE statements R_BRACE {
   ifelse = true;
@@ -365,7 +395,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 }
 ;
 
-var_assignment: IDENTIFIER EQUAL expression SEMICOLON {
+var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
   // isvardeclared broken as a result of adding var to symbol table for function call not working
@@ -505,11 +535,15 @@ mlt_args:expression {
         }
         ;
 
-sign: %empty {
+sign: %empty{
       CodeNode *node = new CodeNode;
       $$ = node;
     }
-    |MINUS 
+    |MINUS{
+      $$ = new CodeNode();
+      char m[] = "-";
+      $$->name = m;
+    }
     ;
 
 conditions: bool_statement 
