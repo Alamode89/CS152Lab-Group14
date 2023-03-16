@@ -8,6 +8,16 @@ func add
 ret _temp0
 endfunc
 
+func mult
+. a
+= a, $0
+. b
+= b, $1
+. _temp1
+* _temp1, a, b
+ret _temp1
+endfunc
+
 func main
 . a
 . b
@@ -17,8 +27,16 @@ func main
 = b, 50
 param a
 param b
-. _temp1
-call add, _temp1
-= c, _temp1
+. _temp3
+call add, _temp3
+= c, _temp3
 .> c
+param c
+. _temp4
++ _temp4, a, b
+param _temp4
+. _temp6
+call mult, _temp6
+= d, _temp6
+.> d
 endfunc

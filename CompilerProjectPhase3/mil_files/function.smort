@@ -1,6 +1,9 @@
-func int add(int a, int b)
-{
+func int add(int a, int b){
     return a + b;
+}
+
+func int mult(int a, int b){
+    return a * b;
 }
 
 main
@@ -12,6 +15,10 @@ main
 
     a = 100;
     b = 50;
+
     c = add(a,b);
     write(c);
+
+    d = mult(c , a + b);
+    write(d);
 }
