@@ -26,6 +26,7 @@ int count_loop_body = 0;
 int count_loop_end = 0;
 int count_params = 0;
 bool ifelse = false;
+bool insideLoop = false;
 
 enum Type {Integer, Array};
 struct Variable{
@@ -195,7 +196,7 @@ std::string new_param_incrementer(){
 %start prog_start
 %token PLUS MINUS MULT DIV MOD L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
 %token <op_val> NUMBER IDENTIFIER
-%token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY MAIN
+%token INTEGER WHILE WHILEO BREAK CONTINUE READ WRITE FUNCTION RETURN ARRAY MAIN
 
 %%
 
@@ -372,6 +373,12 @@ statement:variable_declaration
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
          |array_declaration
          |array_assignment
+         |CONTINUE {
+           if (!insideLoop) {
+            std::string msg = "Error: Continue not inside loop";
+            yyerror(msg.c_str());
+           }
+         }
          |BREAK SEMICOLON {
           CodeNode* node = new CodeNode();
           std::stringstream b;
