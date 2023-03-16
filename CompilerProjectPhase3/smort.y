@@ -197,27 +197,29 @@ functions: %empty {
 }
          ;
 //{add_function_to_symbol_table($3)}
-function: FUNCTION INTEGER IDENTIFIER L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
-        
-         CodeNode *node = new CodeNode;
+function: FUNCTION INTEGER IDENTIFIER {
+        std::string func_name = $3;
+        add_function_to_symbol_table(func_name);
+} L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
          std::string func_name = $3;
-         add_function_to_symbol_table(func_name);
+         CodeNode *node = new CodeNode;
          checkFuncDef(func_name);
+         print_symbol_table();
          node->code = "";
           //add the "func func_name
          node->code +=  std::string("func ") + func_name + std::string("\n");
          //printf("%s\n", node->code.c_str());
           //add the argument code
-          CodeNode *arguments = $5;
+          CodeNode *arguments = $6;
           node->code += arguments->code;
 
           //add the local declarations/statements
-          CodeNode *statements = $8;
+          CodeNode *statements = $9;
           node->code += statements->code;
 
          //add the return statement
          CodeNode *returns = new CodeNode;
-         std::string expression = $10->name;
+         std::string expression = $11->name;
          returns->code = std::string("ret ") + expression.c_str() + std::string("\n");
          node->code += returns->code;
 
