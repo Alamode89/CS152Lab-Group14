@@ -51,10 +51,11 @@ int                 {col+=3;return INTEGER;}
 while               {col+=5;return WHILE;}
 whileo              {col+=6;return WHILEO;}
 break               {col+=5;return BREAK;}
+continue            {col+=8;return CONTINUE;}
 read                {col+=4;return READ;}
 write               {col+=5;return WRITE;}
 func                {col+=4;return FUNCTION;}
-return              {col+= 6;return RETURN;}
+return              {col+=6;return RETURN;}
 arr                 {col+=3;return ARRAY;}
 main                {col+=4;return MAIN;}
 {NUMBER}+           {
