@@ -69,6 +69,7 @@ Table for the symbols in our language and their token name:
 | while  	| WHILE  	|
 | whileo  	| WHILEO  	|
 | break  	| BREAK  	|
+| continue  | CONTINUE  |
 | read  	| READ  	|
 | write  	| WRITE  	|
 | func  	| FUNCTION  |
