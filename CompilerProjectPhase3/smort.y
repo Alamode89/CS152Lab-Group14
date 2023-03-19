@@ -26,6 +26,7 @@ int count_loop_body = 0;
 int count_loop_end = 0;
 int count_params = 0;
 bool ifelse = false;
+int flag_loop;
 
 enum Type {Integer, Array};
 struct Variable{
@@ -190,12 +191,12 @@ std::string new_param_incrementer(){
 
 %type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions
 %type <node> input_output read_write array_assignment array_declaration operation arr_access arguments argument args mlt_args
-%type <node> bool_statement bool_operation branch BREAK
+%type <node> bool_statement bool_operation branch BREAK CONTINUE
 
 %start prog_start
 %token PLUS MINUS MULT DIV MOD L_PAREN R_PAREN EQUAL LESS_THAN GREATER_THAN NOT NOT_EQUAL GTE LTE EQUAL_TO AND OR TRUE FALSE L_BRACE R_BRACE SEMICOLON COMMA L_BRACK R_BRACK IF ELSE ELIF
 %token <op_val> NUMBER IDENTIFIER
-%token INTEGER WHILE WHILEO BREAK READ WRITE FUNCTION RETURN ARRAY MAIN
+%token INTEGER WHILE WHILEO BREAK CONTINUE READ WRITE FUNCTION RETURN ARRAY MAIN
 
 %%
 
@@ -332,6 +333,7 @@ statement:variable_declaration
           std::string label_body = new_body_loop_incrementer();
           std::string label_end = new_end_loop_incrementer();
           node->code += std::string(": ") + label_start + std::string("\n");
+          flag_loop = 1;
           node->code += conditions_node->code;
           node->code += std::string("?:= ") + label_body + std::string(", ") + conditions_node->name + std::string("\n");
           node->code += std::string(":= ") + label_end + std::string("\n");
@@ -339,11 +341,12 @@ statement:variable_declaration
           node->code += statements_node->code;
           node->code += std::string(":= ") + label_start + std::string("\n");
           node->code += std::string(": ") + label_end + std::string("\n");
-
+          flag_loop = 2;
           $$ = node; 
          }
          |IF L_PAREN conditions R_PAREN L_BRACE statements R_BRACE branch{
           //need to create if checks in here lol
+
           std::string temp_if = temp_if_incrementer();
           std::string temp_endif = temp_endif_incrementer();
           CodeNode* node = new CodeNode();
@@ -372,14 +375,28 @@ statement:variable_declaration
          |WHILEO L_BRACE statements R_BRACE WHILE L_PAREN conditions R_PAREN
          |array_declaration
          |array_assignment
+         |CONTINUE SEMICOLON{
+          CodeNode* node = new CodeNode();
+          std::stringstream c;
+          c << std::string("endloop") << count_loop_end;
+          std::string msg = "Error: Continue not inside loop";
+          if (flag_loop == 2) {
+           yyerror(msg.c_str());
+          }
+          node->code = std::string(":= ") + c.str() + std::string("\n");
+          $$ = node;
+         }
          |BREAK SEMICOLON {
           CodeNode* node = new CodeNode();
           std::stringstream b;
           b << std::string("endloop") << count_loop_end;
+          std::string msg = "Error: Break not inside loop";
+          if (flag_loop == 2) {
+            yyerror(msg.c_str());
+          }
           node->code = std::string(":= ") + b.str() + std::string("\n");
           $$ = node;
          }
-       //  |CONTINUE
          ;
 
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
