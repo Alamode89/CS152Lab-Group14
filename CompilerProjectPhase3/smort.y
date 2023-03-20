@@ -65,6 +65,17 @@ bool find(const std::string &value){
   return false;
 }
 
+bool findArr(const std::string &value){
+  Function *f = get_function();
+  for (int i = 0; i < f->declarations.size(); i++) {
+    Variable *v = &f->declarations[i];
+    if(v->name == value && v->type == Array){
+      return true;
+    }
+  }
+  return false;
+}
+
 void add_function_to_symbol_table(std::string &value) {
   Function f;
   f.name = value;
@@ -101,6 +112,13 @@ void checkVarDuplicate(const std::string val) {
 void isVarDeclared(const std::string val) {
   if (!find(val)) {
     std::string msg = "Error: variable '" + val + "' is not declared";
+    yyerror(msg.c_str());
+  }
+}
+
+void isVarArr(const std::string val) {
+  if (findArr(val)) {
+    std::string msg = "Error: array '" + val + "' is not a variable and requires brackets access";
     yyerror(msg.c_str());
   }
 }
@@ -411,7 +429,7 @@ statement:variable_declaration
          ;
 
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
-  Type t = Integer;
+  Type t = Array;
   std::string arr_name = $2;
   add_variable_to_symbol_table(arr_name, t);
   std::string arr_size = $6->name;
@@ -460,6 +478,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
+  isVarArr(variable);
   isVarDeclared(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
