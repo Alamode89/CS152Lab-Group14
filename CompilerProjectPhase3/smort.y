@@ -115,6 +115,16 @@ void checkFuncDef(const std::string val){
   yyerror(msg.c_str());
 }
 
+void checkFuncDuplicate(const std::string val){
+  for (int i = 0; i < symbol_table.size(); i++){
+    if (symbol_table.at(i).name == val){
+      std::string msg = "Error: function '" + val + "' already defined";
+      yyerror(msg.c_str());
+    }
+  }
+  return;
+}
+
 std::string temp_var_incrementer(){
    std::stringstream new_temp_var;
    new_temp_var << std::string("_temp") << count_names;
@@ -233,6 +243,7 @@ functions: %empty{
 //{add_function_to_symbol_table($3)}
 function: FUNCTION INTEGER IDENTIFIER {
         std::string func_name = $3;
+        checkFuncDuplicate(func_name);
         add_function_to_symbol_table(func_name);
 } L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
          std::string func_name = $3;
