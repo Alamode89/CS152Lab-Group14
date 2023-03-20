@@ -65,6 +65,17 @@ bool find(const std::string &value){
   return false;
 }
 
+bool findArr(const std::string &value){
+  Function *f = get_function();
+  for (int i = 0; i < f->declarations.size(); i++) {
+    Variable *v = &f->declarations[i];
+    if(v->name == value && v->type == Array){
+      return true;
+    }
+  }
+  return false;
+}
+
 void add_function_to_symbol_table(std::string &value) {
   Function f;
   f.name = value;
@@ -105,6 +116,13 @@ void isVarDeclared(const std::string val) {
   }
 }
 
+void isVarArr(const std::string val) {
+  if (findArr(val)) {
+    std::string msg = "Error: array '" + val + "' is not a variable and requires brackets access";
+    yyerror(msg.c_str());
+  }
+}
+
 void checkFuncDef(const std::string val){
   for (int i = 0; i < symbol_table.size(); i++){
     if (symbol_table.at(i).name == val){
@@ -113,6 +131,16 @@ void checkFuncDef(const std::string val){
   }
   std::string msg = "Error: function '" + val + "' undefined";
   yyerror(msg.c_str());
+}
+
+void checkFuncDuplicate(const std::string val){
+  for (int i = 0; i < symbol_table.size(); i++){
+    if (symbol_table.at(i).name == val){
+      std::string msg = "Error: function '" + val + "' already defined";
+      yyerror(msg.c_str());
+    }
+  }
+  return;
 }
 
 std::string temp_var_incrementer(){
@@ -233,6 +261,7 @@ functions: %empty{
 //{add_function_to_symbol_table($3)}
 function: FUNCTION INTEGER IDENTIFIER {
         std::string func_name = $3;
+        checkFuncDuplicate(func_name);
         add_function_to_symbol_table(func_name);
 } L_PAREN arguments R_PAREN L_BRACE statements RETURN expression SEMICOLON R_BRACE {
          std::string func_name = $3;
@@ -400,7 +429,7 @@ statement:variable_declaration
          ;
 
 array_declaration: INTEGER IDENTIFIER EQUAL ARRAY L_BRACK expression R_BRACK SEMICOLON {
-  Type t = Integer;
+  Type t = Array;
   std::string arr_name = $2;
   add_variable_to_symbol_table(arr_name, t);
   std::string arr_size = $6->name;
@@ -449,6 +478,7 @@ variable_declaration: INTEGER IDENTIFIER SEMICOLON
 var_assignment: IDENTIFIER EQUAL expression SEMICOLON{
   std::string variable = $1;
   std::string value = $3->name;
+  isVarArr(variable);
   isVarDeclared(variable);
   $$ = new CodeNode();
   $$->code = $3->code;
