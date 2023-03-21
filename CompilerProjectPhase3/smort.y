@@ -206,15 +206,6 @@ std::string new_param_incrementer(){
   int int_val;
 
   struct CodeNode *node;
-  
-  struct S{
-    char *code;
-  } statement;
-
-  struct E{
-    char *place;
-    char *code;
-  } expression;
 }
 
 %type <node> functions function main statements term expression variable_declaration statement sign var_assignment conditions
